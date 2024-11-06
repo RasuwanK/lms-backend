@@ -34,14 +34,6 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-        Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('title');
-            $table->text('description');
-            $table->dateTime('event_date');
-            $table->timestamps();
-        });
 
     }
 
