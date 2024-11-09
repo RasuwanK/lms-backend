@@ -20,6 +20,7 @@ class UserController extends Controller
        //dd($user->password);
        return response()->json($user);
     }
+
     public function delete($id)
     {
         $user = User::findOrFail($id);
@@ -30,6 +31,7 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User not found.'], 404);
     }
+
     public function getFilteredInfo($id,$field): \Illuminate\Http\JsonResponse
     {
         $user = User::findOrFail($id);
