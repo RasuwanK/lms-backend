@@ -38,4 +38,15 @@ class UserController extends Controller
         }
         return response()->json([$field => $user->$field]);
     }
+
+    public function getUserCourses($userId): \Illuminate\Http\JsonResponse
+    {
+        $user = User::with('courses')->find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json($user->courses, 200);
+    }
 }
