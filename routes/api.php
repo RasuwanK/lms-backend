@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -25,9 +26,10 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
 });
 
 //Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'delete']);
+    Route::put('/users/{id}', [UserController::class, 'updateUser']);
+    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
     Route::get('/users/{id}', [UserController::class, 'getUserInfo']);
+    Route::post('/users/{id}', [UserController::class, 'createUser']);
 
     // Event Routes
     Route::get('/users/{id}/events', [EventController::class, 'getAllEvents']);
@@ -37,4 +39,9 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
     Route::put('/users/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
     Route::delete('/users/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
     Route::get('/users/{id}/{field}', [UserController::class, 'getFilteredInfo']);
-//});
+
+    //new routes
+    Route::get('/users/{id}/courses',[UserController::class, 'getUserCourses']);
+    Route::get('/courses/{id}', [CourseController::class, 'getCourseById']);
+
+
