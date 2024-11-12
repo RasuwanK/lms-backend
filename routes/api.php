@@ -1,12 +1,12 @@
 <?php
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     // Retrieve the user by ID
@@ -24,12 +24,19 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
 
 // Routes are begginign with /vi
 Route::prefix('v1')->group(function () {
+    Route::get("/", function() {
+        return ResponseHelper::notFound("Invalid api 1.0.0 version operation");
+    });
+
     Route::get('/test', function () {
         return response()->json(['message' => 'API is working!']);
     });
     // User API
     Route::prefix('users')->group(function () {
         //Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/', function() {
+            return ResponseHelper::notFound("Invalid user operation");
+        });
         Route::put('/{id}', [UserController::class, 'updateUser']);
         Route::delete('/{id}', [UserController::class, 'deleteUser']);
         Route::get('/{id}', [UserController::class, 'getUserInfo']);
@@ -48,7 +55,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}/courses', [UserController::class, 'getUserCourses']);
 
         Route::fallback(function () {
-            return "Invalid user operation";
+            return ResponseHelper::notFound("Invalid user operation"); 
         });
     });
 
@@ -61,6 +68,11 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::fallback(function () {
-        return "Invalid api";
+        return ResponseHelper::notFound("Invalid api version");
     });
+});
+
+// Route does not available in the entire api /api/
+Route::fallback(function () {
+   return ResponseHelper::notFound("Invalid api version"); 
 });
