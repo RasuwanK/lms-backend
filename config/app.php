@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | Used to store the application (API) version
+    */
+    'version' => env('APP_VERSION', '1.0.0')
+
 ];
