@@ -25,23 +25,29 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
     return response()->json(['token' => $token], 200);
 });
 
-//Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/users/{id}', [UserController::class, 'updateUser']);
-    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
-    Route::get('/users/{id}', [UserController::class, 'getUserInfo']);
-    Route::post('/users/{id}', [UserController::class, 'createUser']);
+// User API
+Route::prefix('users')->group(function () {
+    //Route::middleware('auth:sanctum')->group(function () {
+    Route::put('/{id}', [UserController::class, 'updateUser']);
+    Route::delete('/{id}', [UserController::class, 'deleteUser']);
+    Route::get('/{id}', [UserController::class, 'getUserInfo']);
+    Route::post('/{id}', [UserController::class, 'createUser']);
 
     // Event Routes
-    Route::get('/users/{id}/events', [EventController::class, 'getAllEvents']);
-    Route::get('/users/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
+    Route::get('/{id}/events', [EventController::class, 'getAllEvents']);
+    Route::get('/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
 
-    Route::post('/users/{id}/events/{eventid}', [EventController::class, 'createEvent']);
-    Route::put('/users/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
-    Route::delete('/users/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
-    Route::get('/users/{id}/{field}', [UserController::class, 'getFilteredInfo']);
+    Route::post('/{id}/events/{eventid}', [EventController::class, 'createEvent']);
+    Route::put('/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
+    Route::delete('/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
+    Route::get('/{id}/{field}', [UserController::class, 'getFilteredInfo']);
 
     //new routes
-    Route::get('/users/{id}/courses',[UserController::class, 'getUserCourses']);
-    Route::get('/courses/{id}', [CourseController::class, 'getCourseById']);
+    Route::get('/{id}/courses',[UserController::class, 'getUserCourses']);
+});
 
+// Course API
+Route::prefix('courses')->group(function () {
+    Route::get('/{id}', [CourseController::class, 'getCourseById']);
+});
 
