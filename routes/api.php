@@ -1,15 +1,13 @@
 <?php
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PortalUserController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/test', function () {
-    return response()->json(['message' => 'API is working!']);
-});
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     // Retrieve the user by ID
@@ -25,23 +23,60 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
     return response()->json(['token' => $token], 200);
 });
 
-//Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/users/{id}', [UserController::class, 'updateUser']);
-    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
-    Route::get('/users/{id}', [UserController::class, 'getUserInfo']);
-    Route::post('/users/{id}', [UserController::class, 'createUser']);
+// Routes are begginign with /vi
+Route::prefix('v1')->group(function () {
+    Route::get("/", function() {
+        return ResponseHelper::success("Welcome to API ".config('app.version'));
+    });
 
-    // Event Routes
-    Route::get('/users/{id}/events', [EventController::class, 'getAllEvents']);
-    Route::get('/users/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
+    Route::get("/test", function() {
+        return ResponseHelper::success("Welcome to API ".config('app.version'));
+    });
 
-    Route::post('/users/{id}/events/{eventid}', [EventController::class, 'createEvent']);
-    Route::put('/users/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
-    Route::delete('/users/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
-    Route::get('/users/{id}/{field}', [UserController::class, 'getFilteredInfo']);
+    // User API
+    Route::prefix('users')->group(function () {
+        //Route::middleware('auth:sanctuallfunction () {
+        //Route::get('/', [UserController::class, 'all']); 
+        Route::get('/test', function () {
+            return ResponseHelper::success("Testing user API");
+        });
+        Route::post('/', [PortalUserController::class, 'create']);
+        Route::patch('/{id}/', [PortalUserController::class, 'update']);
+        Route::delete('/{id}/', [PortalUserController::class, 'delete']);
+        Route::get('/{id}', [PortalUserController::class, 'getUserInfo']);
+        //Route::post('/{id}', [UserController::class, 'create']);
 
-    //new routes
-    Route::get('/users/{id}/courses',[UserController::class, 'getUserCourses']);
-    Route::get('/courses/{id}', [CourseController::class, 'getCourseById']);
+        // Event Routes
+        Route::get('/{id}/events', [EventController::class, 'getAllEvents']);
+        Route::get('/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
 
+        Route::post('/{id}/events/{eventid}', [EventController::class, 'createEvent']);
+        Route::put('/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
+        Route::delete('/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
+        Route::get('/{id}/{field}', [UserController::class, 'getFilteredInfo']);
 
+        //new routes
+        Route::get('/{id}/courses', [UserController::class, 'getUserCourses']);
+
+        Route::fallback(function () {
+            return ResponseHelper::notFound("Invalid user operation"); 
+        });
+    });
+
+    // Course API
+    Route::prefix('courses')->group(function () {
+        Route::get('/{id}', [CourseController::class, 'getCourseById']);
+        Route::fallback(function() {
+            return "Invalid course operation";
+        });
+    });
+
+    Route::fallback(function () {
+        return ResponseHelper::notFound("Invalid api operation");
+    });
+});
+
+// Route does not available in the entire api /api/
+Route::fallback(function () {
+   return ResponseHelper::notFound("Invalid api version"); 
+});
