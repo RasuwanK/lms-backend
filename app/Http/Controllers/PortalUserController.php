@@ -68,7 +68,7 @@ class PortalUserController extends Controller
 
     public function delete($id, Request $request)
     {
-        if(!$request->isMethod('delete')) {
+        if (!$request->isMethod('delete')) {
             return ResponseHelper::methodInvalid();
         }
 
@@ -167,9 +167,17 @@ class PortalUserController extends Controller
 
     public function read($id)
     {
-        $user = PortalUser::findOrFail($id);
-        //dd($user->password);
-        return response()->json($user);
+        try {
+            $user = PortalUser::find( $id);
+            if(!$user) {
+                return ResponseHelper::notFound('User not found');
+            }
+            return ResponseHelper::success('User found', $user);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
     }
 
     public function getFilteredInfo($id, $field): \Illuminate\Http\JsonResponse

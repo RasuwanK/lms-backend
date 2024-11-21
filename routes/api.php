@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
-        Route::get('/{id}', [PortalUserController::class, 'getUserInfo']);
+        Route::get('/{id}', [PortalUserController::class, 'read']);
         //Route::post('/{id}', [UserController::class, 'create']);
 
         // Event Routes
