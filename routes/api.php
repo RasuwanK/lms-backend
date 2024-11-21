@@ -4,6 +4,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PortalUserController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,22 +26,25 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
 // Routes are begginign with /vi
 Route::prefix('v1')->group(function () {
     Route::get("/", function() {
-        return ResponseHelper::notFound("Invalid api 1.0.0 version operation");
+        return ResponseHelper::success("Welcome to API ".config('app.version'));
     });
 
-    Route::get('/test', function () {
-        return response()->json(['message' => 'API is working!']);
+    Route::get("/test", function() {
+        return ResponseHelper::success("Welcome to API ".config('app.version'));
     });
+
     // User API
     Route::prefix('users')->group(function () {
-        //Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/', function() {
-            return ResponseHelper::notFound("Invalid user operation");
+        //Route::middleware('auth:sanctuallfunction () {
+        //Route::get('/', [UserController::class, 'all']); 
+        Route::get('/test', function () {
+            return ResponseHelper::success("Testing user API");
         });
-        Route::put('/{id}', [UserController::class, 'updateUser']);
-        Route::delete('/{id}', [UserController::class, 'deleteUser']);
-        Route::get('/{id}', [UserController::class, 'getUserInfo']);
-        Route::post('/{id}', [UserController::class, 'createUser']);
+        Route::post('/', [PortalUserController::class, 'create']);
+        Route::patch('/{id}/', [PortalUserController::class, 'update']);
+        Route::delete('/{id}/', [PortalUserController::class, 'delete']);
+        Route::get('/{id}', [PortalUserController::class, 'getUserInfo']);
+        //Route::post('/{id}', [UserController::class, 'create']);
 
         // Event Routes
         Route::get('/{id}/events', [EventController::class, 'getAllEvents']);
@@ -68,7 +72,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::fallback(function () {
-        return ResponseHelper::notFound("Invalid api version");
+        return ResponseHelper::notFound("Invalid api operation");
     });
 });
 
