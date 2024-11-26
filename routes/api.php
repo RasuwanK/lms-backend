@@ -5,13 +5,13 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PortalUserController;
-use App\Models\User;
+use App\Models\PortalUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     // Retrieve the user by ID
-    $user = User::findOrFail($id);
+    $user = PortalUser::findOrFail($id);
 
     if (!$user) {
         return response()->json(['error' => 'User not found'], 404);
@@ -23,8 +23,10 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
     return response()->json(['token' => $token], 200);
 });
 
-// Routes are begginign with /vi
-Route::prefix('v1')->group(function () {
+    Route::get('v1/users',[PortalUserController::class,'all'])->middleware('auth:sanctum');
+
+// Routes are begining with /v1
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get("/", function() {
         return ResponseHelper::success("Welcome to API ".config('app.version'));
     });
@@ -36,7 +38,7 @@ Route::prefix('v1')->group(function () {
     // User API
     Route::prefix('users')->group(function () {
         //Route::middleware('auth:sanctuallfunction () {
-        //Route::get('/', [UserController::class, 'all']); 
+        //Route::get('/', [UserController::class, 'all']);
         Route::get('/test', function () {
             return ResponseHelper::success("Testing user API");
         });
@@ -59,7 +61,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}/courses', [UserController::class, 'getUserCourses']);
 
         Route::fallback(function () {
-            return ResponseHelper::notFound("Invalid user operation"); 
+            return ResponseHelper::notFound("Invalid user operation");
         });
     });
 
@@ -78,5 +80,5 @@ Route::prefix('v1')->group(function () {
 
 // Route does not available in the entire api /api/
 Route::fallback(function () {
-   return ResponseHelper::notFound("Invalid api version"); 
+   return ResponseHelper::notFound("Invalid api version");
 });

@@ -13,7 +13,18 @@ use Illuminate\Http\Request;
 
 class PortalUserController extends Controller
 {
+    public function all(Request $request)
+    {
+        try {
+            $users = PortalUser::all(); // Fetch all users
 
+            // Use the ResponseHelper to return a success response
+            return ResponseHelper::success('Users retrieved successfully', $users);
+        } catch (Exception $e) {
+            // Catch any general exceptions and use ResponseHelper for error response
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
     public function create(AddPortalUserRequest $request)
     {
         // Only submission is via form
