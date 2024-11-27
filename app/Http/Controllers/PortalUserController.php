@@ -25,7 +25,7 @@ class PortalUserController extends Controller
             return ResponseHelper::serverError($e->getMessage());
         }
     }
-    public function create(AddPortalUserRequest $request)
+    public function create(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         // Only submission is via form
         if (!$request->accepts('multipart/form-data')) {
@@ -36,10 +36,7 @@ class PortalUserController extends Controller
         if (!$request->isMethod('post')) {
             return ResponseHelper::methodInvalid();
         }
-
-
         // Must be sent via a form submission
-        // full_name, age, email, mobile, address, insti, password, role, status, course_id
         $full_name = $request->input('full_name');
         $age = $request->input('age');
         $email = $request->input('email');
@@ -62,7 +59,7 @@ class PortalUserController extends Controller
                 'Address' => $address,
                 'Institution' => $institution,
                 'Profile_Picture' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&s',
-                'Password' => Hash::make($password),
+                'Password' => $password,
                 'Role' => $role,
                 'Status' => $status,
                 'Course_Id' => $course_id
@@ -84,7 +81,7 @@ class PortalUserController extends Controller
         }
 
         try {
-            PortalUser::where('User_Id', $id)->delete();
+            PortalUser::where('id', $id)->delete();
             return ResponseHelper::success('User with id ' . $id . ' deleted successfully.');
         } catch (QueryException $qe) {
             return ResponseHelper::serverError($qe->getMessage());
@@ -104,7 +101,6 @@ class PortalUserController extends Controller
         }
 
         // Must be sent via a form submission
-        // full_name, age, email, mobile, address, insti, password, role, status, course_id
         $full_name = $request->json('full_name');
         $age = $request->json('age');
         $email = $request->json('email');
@@ -120,12 +116,12 @@ class PortalUserController extends Controller
 
         // Create a new user
         try {
-            $user = PortalUser::where('User_Id', $id)->first();
+            $user = PortalUser::findOrFail($id);
             if (!$user) {
                 return ResponseHelper::notFound('User not found');
             }
             if ($full_name) {
-                $user->Full_Name = $full_name;
+                $user->Full_name = $full_name;
             }
 
             if ($age) {
@@ -149,7 +145,7 @@ class PortalUserController extends Controller
             }
 
             if ($password) {
-                $user->Password = Hash::make($password);
+                $user->Password = $password;
             }
 
             if ($role) {
@@ -191,23 +187,32 @@ class PortalUserController extends Controller
         }
     }
 
-    public function getFilteredInfo($id, $field): \Illuminate\Http\JsonResponse
+    public function getFilteredInfo($id, $field)
     {
-        $user = PortalUser::findOrFail($id);
-        if (!isset($user->$field)) {
-            return response()->json(['message' => 'Field not found']);
+        try {
+            // Find the user by ID
+            $user = PortalUser::findOrFail($id);
+
+            if (!isset($user->$field)) {
+                return ResponseHelper::notFound('Field not found');
+            }
+            return ResponseHelper::success("$field retrieved successfully", [$field => $user->$field]);
+
+        } catch (QueryException $qe ) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            // Handle general server errors
+            return ResponseHelper::serverError($e->getMessage());
         }
-        return response()->json([$field => $user->$field]);
     }
 
-    public function courses($userId): \Illuminate\Http\JsonResponse
+    public function getUserCourses($userId)
     {
-        $user = PortalUser::with('courses')->find($userId);
-
+        $user = PortalUser::find($userId);
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return ResponseHelper::notFound('User not found');
         }
-
-        return response()->json($user->courses, 200);
+        return ResponseHelper::success('User course fetched successfully', $user->course);
     }
+
 }

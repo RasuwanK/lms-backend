@@ -28,4 +28,9 @@ class PortalUser extends Authenticatable
         'Course_Id',
         'Profile_Picture'
     ];
+
+    public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Course::class,'id'); // assuming the foreign key is 'course_id'
+    }
 }

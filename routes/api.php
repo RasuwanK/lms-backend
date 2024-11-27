@@ -1,64 +1,55 @@
 <?php
 
 use App\Helpers\ResponseHelper;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\PortalUserController;
 use App\Models\PortalUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/generate-token/{id}', function (Request $request, $id) {
-    // Retrieve the user by ID
-    $user = PortalUser::findOrFail($id);
+    Route::post('/generate-token/{id}', function (Request $request, $id) {
+        $user = PortalUser::findOrFail($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $token = $user->createToken('Personal Access Token')->plainTextToken;
+        return response()->json(['token' => $token], 200);
+    });
 
-    if (!$user) {
-        return response()->json(['error' => 'User not found'], 404);
-    }
+    Route::post('/login',[AuthController::class,'login']);
+    Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+    Route::post('/register',[AuthController::class,'register']);
+    //Route::get('v1/users',[PortalUserController::class,'all'])->middleware('auth:sanctum');
 
-    // Create the token
-    $token = $user->createToken('Personal Access Token')->plainTextToken;
-
-    return response()->json(['token' => $token], 200);
-});
-
-    Route::get('v1/users',[PortalUserController::class,'all'])->middleware('auth:sanctum');
-
-// Routes are begining with /v1
+// Routes are beginning with /v1
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get("/", function() {
         return ResponseHelper::success("Welcome to API ".config('app.version'));
     });
 
-    Route::get("/test", function() {
-        return ResponseHelper::success("Welcome to API ".config('app.version'));
-    });
-
     // User API
     Route::prefix('users')->group(function () {
-        //Route::middleware('auth:sanctuallfunction () {
-        //Route::get('/', [UserController::class, 'all']);
+
         Route::get('/test', function () {
             return ResponseHelper::success("Testing user API");
         });
+        Route::get('/all',[PortalUserController::class,'all']);
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
         Route::get('/{id}', [PortalUserController::class, 'read']);
-        //Route::post('/{id}', [UserController::class, 'create']);
 
         // Event Routes
         Route::get('/{id}/events', [EventController::class, 'getAllEvents']);
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
-
+        Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
         Route::post('/{id}/events/{eventid}', [EventController::class, 'createEvent']);
-        Route::put('/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
+        Route::patch('/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
         Route::delete('/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
-        Route::get('/{id}/{field}', [UserController::class, 'getFilteredInfo']);
-
-        //new routes
-        Route::get('/{id}/courses', [UserController::class, 'getUserCourses']);
+        Route::get('/{id}/{field}', [PortalUserController::class, 'getFilteredInfo']);
+        Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
 
         Route::fallback(function () {
             return ResponseHelper::notFound("Invalid user operation");
@@ -78,7 +69,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Route does not available in the entire api /api/
-Route::fallback(function () {
-   return ResponseHelper::notFound("Invalid api version");
-});
+    // Route does not available in the entire api /api/
+    Route::fallback(function () {
+       return ResponseHelper::notFound("Invalid api version");
+    });

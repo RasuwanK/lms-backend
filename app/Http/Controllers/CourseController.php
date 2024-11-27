@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Models\Course;
 use Illuminate\Http\Request;
 
@@ -9,13 +10,14 @@ class CourseController extends Controller
 {
     public function getCourseById($id): \Illuminate\Http\JsonResponse
     {
-        $course = Course::findOrFail($id);
+        $course = Course::find($id);
 
         if (!$course) {
-            return response()->json(['error' => 'Course not found'], 404);
+            return ResponseHelper::notFound('Course not found');
         }
 
-        return response()->json($course, 200);
+        return ResponseHelper::success('Course fetched successfully', $course);
     }
+
 
 }

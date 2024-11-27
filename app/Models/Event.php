@@ -17,4 +17,9 @@ class Event extends Model
         'description',
         'event_date',
     ];
+    public function user()
+    {
+        return $this->belongsTo(PortalUser::class, 'userid');
+    }
+
 }

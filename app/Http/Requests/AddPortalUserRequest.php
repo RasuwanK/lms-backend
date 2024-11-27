@@ -34,7 +34,7 @@ class AddPortalUserRequest extends FormRequest
             'password' => 'required|string|max:255',
             'status' => 'required|string|max:20',
             'course_id' => 'required|string|max:255',
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Max resolution is set here
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Max resolution is set here
         ];
     }
 
@@ -49,7 +49,7 @@ class AddPortalUserRequest extends FormRequest
             'address.required' => 'Address is required',
             'institution.required' => 'Institution is required',
             'password.required' => 'Password is required',
-            'status.required' => 'Status is required',            
+            'status.required' => 'Status is required',
             'course_id.required' => 'Course ID is required',
             'profile_picture.required' => 'Profile picture is required',
 
