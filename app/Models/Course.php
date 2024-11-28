@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class Course extends Model
 {
-    use HasFactory;
-    //protected $primaryKey = 'course_id';
+    use HasFactory,HasApiTokens;
+    protected $primaryKey = 'id';
+    protected $table = 'courses';
 
     protected $fillable = [
         'course_name',
@@ -32,7 +34,11 @@ class Course extends Model
     // Define the relationship with User (many-to-many)
     public function users()
     {
-        return $this->belongsToMany(User::class, 'enrollments', 'course_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(PortalUser::class, 'enrollments', 'course_id', 'user_id')->withTimestamps();
+    }
+    public function portalUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PortalUser::class, 'course_id', 'id'); // Foreign key is 'course_id' in portal_users, primary key is 'id' in courses
     }
 
 }

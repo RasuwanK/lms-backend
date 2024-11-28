@@ -26,7 +26,7 @@ class Module extends Model
     // Define the relationship with User (many-to-many if needed)
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_modules', 'module_id', 'user_id')
+        return $this->belongsToMany(PortalUser::class, 'user_modules', 'module_id', 'user_id')
             ->withTimestamps();
     }
 }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps(); // created_at and updated_at fields
 
             // Foreign key constraint (assuming users table exists)
-            $table->foreign('userid')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('userid')->references('id')->on('portal_users')->onDelete('cascade');
         });
     }
 
