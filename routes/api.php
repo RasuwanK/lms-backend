@@ -25,6 +25,10 @@ use Illuminate\Support\Facades\Route;
     Route::patch('/v1/modules/{id}',[ModuleController::class,'updateModuleById']);
     Route::delete('/v1/modules/{id}',[ModuleController::class,'deleteModuleById']);
 
+    Route::get('v1/courses/{id}/modules',[CourseController::class,'listModules']);
+    Route::post('v1/courses/{id}/modules',[CourseController::class,'attachModules']);
+    Route::delete('v1/courses/{id}/modules',[CourseController::class,'detachModules']);
+
 
     Route::post('/login',[AuthController::class,'login']);
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');

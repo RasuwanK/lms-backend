@@ -29,4 +29,9 @@ class Module extends Model
         return $this->belongsToMany(PortalUser::class, 'user_modules', 'module_id', 'user_id')
             ->withTimestamps();
     }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_module');
+    }
 }
