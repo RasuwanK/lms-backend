@@ -26,10 +26,10 @@ class Course extends Model
     }
 
     // Define the relationship with Module
-    public function modules()
-    {
-        return $this->hasMany(Module::class);
-    }
+//    public function module()
+//    {
+//        return $this->hasMany(Module::class);
+//    }
 
     // Define the relationship with User (many-to-many)
     public function users()
@@ -39,6 +39,11 @@ class Course extends Model
     public function portalUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PortalUser::class, 'course_id', 'id'); // Foreign key is 'course_id' in portal_users, primary key is 'id' in courses
+    }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'course_module');
     }
 
 }

@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
+
+
     public function showAllModules(Request $request)
     {
         try {
@@ -41,7 +43,6 @@ class ModuleController extends Controller
     public function addModule(Request $request)
     {
         try {
-            // Validate the request data
             $validated = $request->validate([
                 'module_name' => 'required|string|max:255',
                 'credit_value' => 'nullable|integer',
@@ -49,16 +50,11 @@ class ModuleController extends Controller
                 'writing_exam_count' => 'nullable|integer',
                 'course_id' => 'required|exists:courses,id',
             ]);
-
-            // Create a new module
             $module = Module::create($validated);
-
             return ResponseHelper::success('Module created successfully', $module);
         } catch (QueryException $qe) {
-            // Handle database query exceptions
             return ResponseHelper::serverError($qe->getMessage());
         } catch (Exception $e) {
-            // Handle general exceptions
             return ResponseHelper::serverError($e->getMessage());
         }
     }
@@ -66,7 +62,6 @@ class ModuleController extends Controller
     public function updateModuleById(Request $request, $id)
     {
         try {
-            // Validate the request data
             $validated = $request->validate([
                 'module_name' => 'sometimes|string|max:255',
                 'credit_value' => 'sometimes|nullable|integer',
@@ -75,21 +70,15 @@ class ModuleController extends Controller
                 'course_id' => 'sometimes|exists:courses,id',
             ]);
 
-            // Find the module by ID
             $module = Module::findOrFail($id);
-
-            // Update the module with validated data
             $module->update($validated);
 
             return ResponseHelper::success('Module updated successfully', $module);
         } catch (QueryException $qe) {
-            // Handle database query exceptions
             return ResponseHelper::serverError($qe->getMessage());
         } catch (ModelNotFoundException $mnfe) {
-            // Handle not found exception
             return ResponseHelper::notFound('Module not found');
         } catch (Exception $e) {
-            // Handle general exceptions
             return ResponseHelper::serverError($e->getMessage());
         }
     }
@@ -100,7 +89,6 @@ class ModuleController extends Controller
         if (!$request->isMethod('delete')) {
             return ResponseHelper::methodInvalid();
         }
-
         try {
             Module::where('id', $id)->delete();
             return ResponseHelper::success('Module with id ' . $id . ' deleted successfully.');
