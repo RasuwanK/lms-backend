@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Activity;
 use App\Models\Module;
 use App\Models\PortalUser;
 use Exception;
@@ -17,10 +18,10 @@ class ModuleController extends Controller
     public function showAllModules(Request $request)
     {
         try {
-            $users = Module::all(); // Fetch all users
+            $modules = Module::all(); // Fetch all users
 
             // Use the ResponseHelper to return a success response
-            return ResponseHelper::success('Modules retrieved successfully', $users);
+            return ResponseHelper::success('Modules retrieved successfully', $modules);
         } catch (Exception $e) {
             // Catch any general exceptions and use ResponseHelper for error response
             return ResponseHelper::serverError($e->getMessage());
@@ -30,10 +31,13 @@ class ModuleController extends Controller
     public function getModuleById(Request $request,$id)
     {
         try {
-            $user = Module::find($id); // Fetch all users
-
+            $module = Module::find($id); // Fetch all users
+            if (!$module) {
+                // Return a not found error if the module doesn't exist
+                return ResponseHelper::notFound('Module not found');
+            }
             // Use the ResponseHelper to return a success response
-            return ResponseHelper::success('Modules retrieved successfully', $user);
+            return ResponseHelper::success('Modules retrieved successfully', $module);
         } catch (Exception $e) {
             // Catch any general exceptions and use ResponseHelper for error response
             return ResponseHelper::serverError($e->getMessage());
@@ -95,5 +99,84 @@ class ModuleController extends Controller
         } catch (QueryException $qe) {
             return ResponseHelper::serverError($qe->getMessage());
         }
+    }
+
+    public function getAllAssignments($id)
+    {
+        $assignments = Activity::where('module_id', $id)
+            ->where('type', 'assignment')
+            ->get();
+        return response()->json($assignments);
+    }
+
+    public function getAllQuizes($id)
+    {
+        $assignments = Activity::where('module_id', $id)
+            ->where('type', 'quiz')
+            ->get();
+        return response()->json($assignments);
+    }
+
+    public function getAllActivitiesForAModule($id)
+    {
+        $module = Module::with('activities')->findOrFail($id); // Fetch module and its activities
+        return response()->json($module->activities);
+    }
+
+    public function getActivity($id,$activity_id)
+    {
+        $module = Module::find($id); // Fetch module and its activities
+        $activity = $module->activities->findOrFail($activity_id);
+        return response()->json($activity);
+    }
+
+    public function deleteActivity($id,$activity_id)
+    {
+        $module = Module::find($id); // Fetch module and its activities
+        $activity = $module->activities->findOrFail($activity_id);
+        $activity->delete();
+        return response()->json($activity);
+    }
+
+    public function UpdateActivity(Request $request,$id,$activity_id)
+    {
+        $module = Module::find($id); // Fetch module and its activities
+        $activity = $module->activities->findOrFail($activity_id);
+        $activity->update($request->all());
+        return response()->json($activity);
+    }
+
+    public function addAssignment(Request $request,$id)
+    {
+        $module = Module::findOrFail($id);
+
+        $activity = $module->activities()->create([
+            'activity_name' => $request->activity_name,
+            'type' => 'assignment',
+            'start_date' => $request->start_date,
+            'start_time' => $request->start_time,
+            'end_date' => $request->end_date,
+            'end_time' => $request->end_time,
+            'instructions' => $request->instructions,
+        ]);
+
+        return response()->json($activity, 201);
+    }
+
+    public function addQuiz(Request $request,$id)
+    {
+        $module = Module::findOrFail($id);
+
+        $activity = $module->activities()->create([
+            'activity_name' => $request->activity_name,
+            'type' => 'quiz',
+            'start_date' => $request->start_date,
+            'start_time' => $request->start_time,
+            'end_date' => $request->end_date,
+            'end_time' => $request->end_time,
+            'question_count' => $request->question_count,
+        ]);
+
+        return response()->json($activity, 201);
     }
 }
