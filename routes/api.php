@@ -18,12 +18,27 @@ use Illuminate\Support\Facades\Route;
         $token = $user->createToken('Personal Access Token')->plainTextToken;
         return response()->json(['token' => $token], 200);
     });
+    Route::prefix('/v1/modules')->group(function () {
+        Route::get('/',[ModuleController::class,'showAllModules']);
+        Route::get('/{id}',[ModuleController::class,'getModuleById']);
+        Route::post('/',[ModuleController::class,'addModule']);
+        Route::patch('/{id}',[ModuleController::class,'updateModuleById']);
+        Route::delete('/{id}',[ModuleController::class,'deleteModuleById']);
+        Route::get('/{id}/activities',[ModuleController::class,'getAllActivitiesForAModule']);
+        Route::get('{id}/activities/assignment',[ModuleController::class,'getAllAssignments']);
+        Route::get('{id}/activities/quiz',[ModuleController::class,'getAllQuizes']);
+        Route::get('/{id}/activities/{activityid}',[ModuleController::class,'getActivity']);
+        Route::patch('/{id}/activities/{activityid}',[ModuleController::class,'updateActivity']);
+        Route::post('/{id}/activities/assignment',[ModuleController::class,'addAssignment']);
+        Route::post('/{id}/activities/quiz',[ModuleController::class,'addQuiz']);
+        Route::delete('/{id}/activities/{activityid}',[ModuleController::class,'deleteActivity']);
+    });
 
-    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);
-    Route::get('/v1/modules/{id}',[ModuleController::class,'getModuleById']);
-    Route::post('/v1/modules',[ModuleController::class,'addModule']);
-    Route::patch('/v1/modules/{id}',[ModuleController::class,'updateModuleById']);
-    Route::delete('/v1/modules/{id}',[ModuleController::class,'deleteModuleById']);
+//    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);
+//    Route::get('/v1/modules/{id}',[ModuleController::class,'getModuleById']);
+//    Route::post('/v1/modules',[ModuleController::class,'addModule']);
+//    Route::patch('/v1/modules/{id}',[ModuleController::class,'updateModuleById']);
+//    Route::delete('/v1/modules/{id}',[ModuleController::class,'deleteModuleById']);
 
     Route::get('v1/courses/{id}/modules',[CourseController::class,'listModules']);
     Route::post('v1/courses/{id}/modules',[CourseController::class,'attachModules']);

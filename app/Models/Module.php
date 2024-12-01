@@ -34,4 +34,9 @@ class Module extends Model
     {
         return $this->belongsToMany(Course::class, 'course_module');
     }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
 }
