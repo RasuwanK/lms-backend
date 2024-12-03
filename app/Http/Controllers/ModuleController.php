@@ -148,7 +148,7 @@ class ModuleController extends Controller
 
     public function addAssignment(Request $request,$id)
     {
-        $module = Module::findOrFail($id);
+        $module = Module::with('courses')->findOrFail($id);
 
         $activity = $module->activities()->create([
             'activity_name' => $request->activity_name,
@@ -160,12 +160,26 @@ class ModuleController extends Controller
             'instructions' => $request->instructions,
         ]);
 
-        return response()->json($activity, 201);
+        $event = $activity->events()->create([
+            'event_name' => $activity->activity_name,
+            'start_date' => $activity->start_date,
+            'start_time' => $activity->start_time,
+            'end_date' => $activity->end_date,
+            'end_time' => $activity->end_time,
+            'description' => $activity->description,
+            'status' => 'scheduled',
+        ]);
+        $userids = $module->courses->flatMap(function ($course) {
+            return $course->users->pluck('id');
+        })->unique();
+
+        $event->users()->attach($userids);
+        return response()->json(['activity'=>$activity,'event'=> $event], 201);
     }
 
     public function addQuiz(Request $request,$id)
     {
-        $module = Module::findOrFail($id);
+        $module = Module::with('courses')->findOrFail($id);
 
         $activity = $module->activities()->create([
             'activity_name' => $request->activity_name,
@@ -176,7 +190,20 @@ class ModuleController extends Controller
             'end_time' => $request->end_time,
             'question_count' => $request->question_count,
         ]);
+        $event = $activity->events()->create([
+            'event_name' => $activity->activity_name,
+            'start_date' => $activity->start_date,
+            'start_time' => $activity->start_time,
+            'end_date' => $activity->end_date,
+            'end_time' => $activity->end_time,
+            'description' => $activity->description,
+            'status' => 'scheduled',
+        ]);
+        $userids = $module->courses->flatMap(function ($course) {  //assign all users who are enrolled in this module
+            return $course->users->pluck('id');                    // no matter which course
+        })->unique();
 
-        return response()->json($activity, 201);
+        $event->users()->attach($userids);
+        return response()->json(['activity'=>$activity,'event'=> $event], 201);
     }
 }

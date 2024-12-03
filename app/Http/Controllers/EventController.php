@@ -4,56 +4,94 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\Event;
+use App\Models\PortalUser;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function getAllEvents($userid): \Illuminate\Http\JsonResponse
+    public function createEventForUsers(Request $request)
     {
-        $events = Event::where('userid', $userid)->get();
+        // Validate input
+        $request->validate([
+            'event_name' => 'required|string',
+            'start_date' => 'required|date',
+            'user_ids' => 'required|array', // Expect an array of user IDs
+            'user_ids.*' => 'exists:portal_users,id', // Ensure each ID exists in the users table
+        ]);
 
-        if ($events->isEmpty()) {
-            return ResponseHelper::notFound('No events found for this user');
+        if (!$request->has('activity_id')){
+            $event = Event::create([
+                'event_name' => $request->event_name,
+                'start_date' => $request->start_date,
+                'start_time' => $request->start_time,
+                'end_date' => $request->end_date,
+                'end_time' => $request->end_time,
+                'description' => $request->description,
+                'status' => 'scheduled',
+            ]);
         }
-        return ResponseHelper::success('Events fetched successfully', $events);
+
+
+        // Attach the event to the provided users
+        $event->users()->attach($request->user_ids);
+
+        return response()->json(['event' => $event], 201);
     }
 
-    public function getEventInfo($userid, $eventid): \Illuminate\Http\JsonResponse
+    public function getAllEventsForAUser($userId)
     {
-        $event = Event::where('userid', $userid)->where('id', $eventid)->first();
+        $user = PortalUser::with('events')->findOrFail($userId);
+
+        return response()->json($user->events);
+    }
+
+    public function getSpecificEventForAUser($userId, $eventId)
+    {
+        $event = Event::whereHas('users', function ($query) use ($userId) {
+            $query->where('portal_users.id', $userId); // Explicitly specify the table name
+        })->find($eventId);
 
         if (!$event) {
-            return ResponseHelper::notFound('Event not found');
+            return ResponseHelper::notFound('Event not found for the specified user.');
         }
-        return ResponseHelper::success('Event details fetched successfully', $event);
+
+        return ResponseHelper::success('Event retrieved successfully.', $event);
     }
 
-    public function createEvent(Request $request, $userid, $eventid): \Illuminate\Http\JsonResponse
+    public function getSpecificEventDetails($eventId)
     {
-        $event = new Event();
-        $event->userid = $userid;
-        $event->id = $eventid;
-        $event->fill($request->all());
-        $event->save();
-        return ResponseHelper::success('Event created successfully', $event);
-    }
-
-    public function updateEvent(Request $request, $userid, $eventid): \Illuminate\Http\JsonResponse
-    {
-        $event = Event::where('userid', $userid)->where('id', $eventid)->first();
-
+        $event = Event::findOrFail($eventId);
         if (!$event) {
-            return ResponseHelper::notFound('Event not found');
+            return ResponseHelper::notFound('Event not found for the specified user.');
         }
 
+        return ResponseHelper::success('Event retrieved successfully.', $event);
+    }
+
+    public function updateEvent(Request $request, $eventId)
+    {
+        $event = Event::findOrFail($eventId); // Fetch the event
+
+        // Validate the input
+        $request->validate([
+            'event_name' => 'string|max:255',
+            'start_date' => 'date',
+            'start_time' => 'date_format:H:i',
+            'end_date' => 'date|nullable',
+            'end_time' => 'nullable|date_format:H:i',
+            'status' => 'string|in:scheduled,completed,canceled',
+            'description' => 'string|nullable',
+        ]);
+
+        // Update the event with the request data
         $event->update($request->all());
-        return ResponseHelper::success('Event updated successfully', $event);
+
+        return response()->json(['message' => 'Event updated successfully.', 'event' => $event]);
     }
 
-    public function deleteEvent(Request $request, $userid, $eventid): \Illuminate\Http\JsonResponse
+    public function deleteEvent($eventid)
     {
-        $event = Event::where('userid', $userid)->where('id', $eventid)->first();
-
+        $event = Event::find($eventid);
         if (!$event) {
             return ResponseHelper::notFound('Event not found');
         }

@@ -29,8 +29,13 @@ class PortalUser extends Authenticatable
         'Profile_Picture'
     ];
 
-    public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function courses()
     {
-        return $this->belongsTo(Course::class,'id'); // assuming the foreign key is 'course_id'
+        return $this->belongsToMany(Course::class, 'enrollments');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_user','user_id','event_id' );
     }
 }

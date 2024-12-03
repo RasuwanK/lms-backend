@@ -20,7 +20,10 @@ class Activity extends Model
         'question_count',
         'module_id'
     ];
-
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
     public function module()
     {
         return $this->belongsTo(Module::class);
