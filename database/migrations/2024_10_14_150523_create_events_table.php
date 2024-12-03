@@ -12,16 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id(); // Primary key: event ID
-            $table->unsignedBigInteger('userid'); // Foreign key: User ID
-            $table->string('title'); // Title of the event
-            $table->text('description')->nullable(); // Event description (optional)
-            $table->dateTime('event_date'); // Date and time of the event
-            $table->timestamps(); // created_at and updated_at fields
-
-            // Foreign key constraint (assuming users table exists)
-            $table->foreign('userid')->references('id')->on('portal_users')->onDelete('cascade');
+            $table->id();
+            $table->foreignId('activity_id')->nullable()->constrained('activities')->onDelete('cascade');
+            $table->string('event_name');
+            $table->date('start_date');
+            $table->time('start_time')->nullable();
+            $table->date('end_date')->nullable();
+            $table->time('end_time')->nullable();
+            $table->string('status')->default('scheduled');
+            $table->text('description')->nullable();
+            $table->timestamps();
         });
+
     }
 
     /**

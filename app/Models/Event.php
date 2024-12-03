@@ -12,14 +12,21 @@ class Event extends Model
     use HasFactory;
     use HasApiTokens;
     protected $fillable = [
-        'userid',
-        'title',
-        'description',
-        'event_date',
+        'activity_id',
+        'event_name',
+        'start_date',
+        'start_time',
+        'end_date',
+        'end_time',
+        'status',
+        'description'
     ];
-    public function user()
+    public function activity()
     {
-        return $this->belongsTo(PortalUser::class, 'userid');
+        return $this->belongsTo(Activity::class);
     }
-
+    public function users()
+    {
+        return $this->belongsToMany(PortalUser::class, 'event_user','event_id','user_id');
+    }
 }

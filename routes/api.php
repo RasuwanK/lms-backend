@@ -32,7 +32,15 @@ use Illuminate\Support\Facades\Route;
         Route::post('/{id}/activities/assignment',[ModuleController::class,'addAssignment']);
         Route::post('/{id}/activities/quiz',[ModuleController::class,'addQuiz']);
         Route::delete('/{id}/activities/{activityid}',[ModuleController::class,'deleteActivity']);
+
     });
+
+    Route::get('/v1/users/{id}/events', [EventController::class, 'getAllEventsForAUser']);
+    Route::get('/v1/events/{eventid}',[EventController::class, 'getSpecificEventDetails']);
+    Route::post('/v1/events', [EventController::class, 'createEventForUsers']); //userids will be passed in body
+    Route::get('/v1/users/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);
+    Route::patch('/v1/events/{eventid}', [EventController::class, 'updateEvent']);
+    Route::delete('/v1/events/{eventid}', [EventController::class, 'deleteEvent']);
 
 //    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);
 //    Route::get('/v1/modules/{id}',[ModuleController::class,'getModuleById']);
@@ -69,12 +77,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [PortalUserController::class, 'read']);
 
         // Event Routes
-        Route::get('/{id}/events', [EventController::class, 'getAllEvents']);
-        Route::get('/{id}/events/{eventid}', [EventController::class, 'getEventInfo']);
         Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
-        Route::post('/{id}/events/{eventid}', [EventController::class, 'createEvent']);
-        Route::patch('/{id}/events/{eventid}', [EventController::class, 'updateEvent']);
-        Route::delete('/{id}/events/{eventid}', [EventController::class, 'deleteEvent']);
         Route::get('/{id}/{field}', [PortalUserController::class, 'getFilteredInfo']);
         Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
 
