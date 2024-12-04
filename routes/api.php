@@ -1,6 +1,8 @@
 <?php
 
 use App\Helpers\ResponseHelper;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
@@ -32,8 +34,22 @@ use Illuminate\Support\Facades\Route;
         Route::post('/{id}/activities/assignment',[ModuleController::class,'addAssignment']);
         Route::post('/{id}/activities/quiz',[ModuleController::class,'addQuiz']);
         Route::delete('/{id}/activities/{activityid}',[ModuleController::class,'deleteActivity']);
-
+        Route::post('/{id}/announcements', [ModuleController::class, 'createAnnouncement']);
+        Route::get('/{id}/announcements', [ModuleController::class, 'getAnnouncements']);
     });
+        Route::patch('v1/announcements/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
+        Route::delete('v1/announcements/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
+        Route::post('v1/announcements/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
+        Route::get('v1/announcements/{announcementid}/answers', [AnnouncementController::class, 'getAnswers']);
+        Route::patch('v1/announcements/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'updateAnswer'])->middleware('auth:sanctum');
+        Route::delete('v1/announcements/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'deleteAnswer'])->middleware('auth:sanctum');
+
+
+    Route::post('/v1/quiz/{id}/questions',[ActivityController::class,'addQuestion']);
+    Route::get('/v1/quiz/{id}/questions',[ActivityController::class,'getQuestions']);
+    Route::patch('/v1/quiz/{id}/questions/{queid}',[ActivityController::class,'updateQuestion']);
+    Route::delete('/v1/quiz/{id}/questions/{queid}',[ActivityController::class,'deleteSpecificQuestion']);
+    Route::delete('/v1/quiz/{id}/questions',[ActivityController::class,'deleteAllQuestion']);
 
     Route::get('/v1/users/{id}/events', [EventController::class, 'getAllEventsForAUser']);
     Route::get('/v1/events/{eventid}',[EventController::class, 'getSpecificEventDetails']);

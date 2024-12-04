@@ -36,10 +36,10 @@ class Course extends Model
     {
         return $this->belongsToMany(PortalUser::class, 'enrollments', 'course_id', 'user_id')->withTimestamps();
     }
-    public function portalUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(PortalUser::class, 'course_id', 'id'); // Foreign key is 'course_id' in portal_users, primary key is 'id' in courses
-    }
+//    public function portalUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
+//    {
+//        return $this->hasMany(PortalUser::class, 'course_id', 'id'); // Foreign key is 'course_id' in portal_users, primary key is 'id' in courses
+//    }
 
     public function modules()
     {

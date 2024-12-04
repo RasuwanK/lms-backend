@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\Activity;
+use App\Models\Announcement;
 use App\Models\Module;
 use App\Models\PortalUser;
 use Exception;
@@ -28,7 +29,7 @@ class ModuleController extends Controller
         }
     }
 
-    public function getModuleById(Request $request,$id)
+    public function getModuleById(Request $request, $id)
     {
         try {
             $module = Module::find($id); // Fetch all users
@@ -123,14 +124,14 @@ class ModuleController extends Controller
         return response()->json($module->activities);
     }
 
-    public function getActivity($id,$activity_id)
+    public function getActivity($id, $activity_id)
     {
         $module = Module::find($id); // Fetch module and its activities
         $activity = $module->activities->findOrFail($activity_id);
         return response()->json($activity);
     }
 
-    public function deleteActivity($id,$activity_id)
+    public function deleteActivity($id, $activity_id)
     {
         $module = Module::find($id); // Fetch module and its activities
         $activity = $module->activities->findOrFail($activity_id);
@@ -138,7 +139,7 @@ class ModuleController extends Controller
         return response()->json($activity);
     }
 
-    public function UpdateActivity(Request $request,$id,$activity_id)
+    public function updateActivity(Request $request, $id, $activity_id)
     {
         $module = Module::find($id); // Fetch module and its activities
         $activity = $module->activities->findOrFail($activity_id);
@@ -146,7 +147,7 @@ class ModuleController extends Controller
         return response()->json($activity);
     }
 
-    public function addAssignment(Request $request,$id)
+    public function addAssignment(Request $request, $id)
     {
         $module = Module::with('courses')->findOrFail($id);
 
@@ -174,10 +175,10 @@ class ModuleController extends Controller
         })->unique();
 
         $event->users()->attach($userids);
-        return response()->json(['activity'=>$activity,'event'=> $event], 201);
+        return response()->json(['activity' => $activity, 'event' => $event], 201);
     }
 
-    public function addQuiz(Request $request,$id)
+    public function addQuiz(Request $request, $id)
     {
         $module = Module::with('courses')->findOrFail($id);
 
@@ -204,6 +205,55 @@ class ModuleController extends Controller
         })->unique();
 
         $event->users()->attach($userids);
-        return response()->json(['activity'=>$activity,'event'=> $event], 201);
+        return response()->json(['activity' => $activity, 'event' => $event], 201);
     }
+
+    public function createAnnouncement(Request $request, $moduleId)
+    {
+        $module = Module::findOrFail($moduleId);
+
+        $request->validate([
+            'topic' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        $announcement = $module->announcements()->create([
+            'topic' => $request->topic,
+            'description' => $request->description,
+        ]);
+
+        return response()->json(['message' => 'Announcement created successfully.', 'announcement' => $announcement], 201);
+    }
+
+    public function getAnnouncements($moduleId)
+    {
+        $module = Module::with('announcements')->findOrFail($moduleId);
+
+        return response()->json($module->announcements);
+    }
+
+    public function updateAnnouncement(Request $request, $announcementId)
+    {
+        $announcement = Announcement::findOrFail($announcementId);
+
+        $request->validate([
+            'topic' => 'string|max:255|nullable',
+            'description' => 'string|nullable',
+        ]);
+
+        $announcement->update($request->only('topic', 'description'));
+
+        return response()->json(['message' => 'Announcement updated successfully.', 'announcement' => $announcement]);
+    }
+
+    public function deleteAnnouncement($announcementId)
+    {
+        $announcement = Announcement::findOrFail($announcementId);
+
+        $announcement->delete();
+
+        return response()->json(['message' => 'Announcement deleted successfully.']);
+    }
+
 }
+
