@@ -31,11 +31,15 @@ class PortalUser extends Authenticatable
 
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'enrollments');
+        return $this->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')->withTimestamps();
     }
 
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_user','user_id','event_id' );
+    }
+
+    public function answers(){
+        return $this->hasMany(Answer::class , 'user_id');
     }
 }

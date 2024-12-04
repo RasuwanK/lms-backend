@@ -79,9 +79,10 @@ class AuthController extends Controller
 
             // Generate a personal access token for the user
             $token = $user->createToken('auth_token')->plainTextToken;
+            $user->courses()->attach($request->course_id);
 
             // Return success response
-            return ResponseHelper::success('Registration successful', [
+            return ResponseHelper::success('Registration successful and enrolled', [
                 'user' => $user,
                 'access_token' => $token,
                 'token_type' => 'Bearer',

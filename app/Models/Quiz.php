@@ -16,4 +16,6 @@ class Quiz extends Model
             $query->where('type', 'quiz');
         });
     }
+
+
 }
