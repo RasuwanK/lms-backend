@@ -42,4 +42,13 @@ class PortalUser extends Authenticatable
     public function answers(){
         return $this->hasMany(Answer::class , 'user_id');
     }
+
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'participants', 'user_id', 'activity_id')
+            ->withPivot('submission', 'marks', 'is_done')
+            ->withTimestamps();
+    }
+
+
 }

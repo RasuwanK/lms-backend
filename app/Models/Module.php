@@ -44,4 +44,9 @@ class Module extends Model
     {
         return $this->hasMany(Announcement::class);
     }
+
+    public function topics()
+    {
+        return $this->hasMany(Topic::class);
+    }
 }

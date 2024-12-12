@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Activity;
 use App\Models\PortalUser;
 use App\Http\Requests\AddPortalUserRequest;
 use App\Http\Requests\UpdatePortalUserRequest;
@@ -214,5 +215,7 @@ class PortalUserController extends Controller
         }
         return ResponseHelper::success('User course fetched successfully', $user->course);
     }
+
+
 
 }

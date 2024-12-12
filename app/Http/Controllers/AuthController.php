@@ -12,35 +12,39 @@ use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
-    public function login(Request $request): \Illuminate\Http\JsonResponse
+    public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-        $user = PortalUser::where('email', $request->email)->first();
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+            $user = PortalUser::where('email', $request->email)->first();
+
+            if (!$user) {
+                return ResponseHelper::unauthorized('Invalid credentials');
+            }
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return ResponseHelper::success('Login successful', ['user' => $user, 'token' => $token,]);
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while logging in.', $e->getMessage());
         }
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'user' => $user,
-                'token' => $token
-            ], 200);
-
-
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            // Revoke all tokens associated with the user
+            $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Logged out successfully']);
+            return ResponseHelper::success('Logged out successfully.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while logging out.', $e->getMessage());
+        }
     }
+
 
     public function register(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
