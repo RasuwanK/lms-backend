@@ -2,95 +2,122 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Models\Activity;
 use App\Models\Question;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
     public function addQuestion(Request $request, $quizId)
     {
-        $quiz = Activity::where('id', $quizId)->where('type', 'quiz')->firstOrFail();
+        try {
+            $quiz = Activity::where('id', $quizId)->where('type', 'quiz')->firstOrFail();
 
-        // Validate incoming request
-        $request->validate([
-            'questions' => 'required|array',
-            'questions.*.question_number' => 'required|integer',
-            'questions.*.question' => 'required|string',
-            'questions.*.question_type' => 'required|in:single_answer,multiple_choice',
-            'questions.*.answer' => 'required|string',
-            'questions.*.options' => 'nullable|array',
-        ]);
+            $request->validate([
+                'questions' => 'required|array',
+                'questions.*.question_number' => 'required|integer',
+                'questions.*.question' => 'required|string',
+                'questions.*.question_type' => 'required|in:single_answer,multiple_choice',
+                'questions.*.answer' => 'required|string',
+                'questions.*.options' => 'nullable|array',
+            ]);
 
-        // Check the current count of questions
-        $currentQuestionCount = $quiz->questions()->count();
-        $newQuestionCount = count($request->questions);
-        $maxQuestions = $quiz->question_count;
+            $currentQuestionCount = $quiz->questions()->count();
+            $newQuestionCount = count($request->questions);
+            $maxQuestions = $quiz->question_count;
 
-        // Validate if the new questions exceed the limit
-        if (($currentQuestionCount + $newQuestionCount) > $maxQuestions) {
-            return response()->json([
-                'message' => 'Cannot add more questions. Maximum question count exceeded.',
-            ], 422);
+            if (($currentQuestionCount + $newQuestionCount) > $maxQuestions) {
+                return ResponseHelper::validationError('Cannot add more questions. Maximum question count exceeded.');
+            }
+
+            foreach ($request->questions as $questionData) {
+                $quiz->questions()->create($questionData);
+            }
+
+            return ResponseHelper::success('Questions added successfully.');
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Quiz not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while adding questions.', $e->getMessage());
         }
-
-        // Add the questions to the quiz
-        foreach ($request->questions as $questionData) {
-            $quiz->questions()->create($questionData);
-        }
-
-        return response()->json(['message' => 'Questions added successfully.']);
     }
 
-    public function getQuestions($quizid)
+    public function getQuestions($quizId)
     {
-        $quiz = Activity::where('id',$quizid)
-            ->where('type', 'quiz')
-            ->with('questions')
-            ->firstOrFail();
+        try {
+            $quiz = Activity::where('id', $quizId)
+                ->where('type', 'quiz')
+                ->with('questions')
+                ->firstOrFail();
 
-        return response()->json($quiz->questions);
+            return ResponseHelper::success('Questions retrieved successfully.', $quiz->questions);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Quiz not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while retrieving questions.', $e->getMessage());
+        }
     }
 
     public function updateQuestion(Request $request, $quizId, $questionId)
     {
-        // Validate input
-        $request->validate([
-            'question_number' => 'integer',
-            'question' => 'string',
-            'question_type' => 'in:single_answer,multiple_choice',
-            'answer' => 'string|nullable',
-            'options' => 'array|nullable',
-        ]);
+        try {
+            $request->validate([
+                'question_number' => 'integer',
+                'question' => 'string',
+                'question_type' => 'in:single_answer,multiple_choice',
+                'answer' => 'string|nullable',
+                'options' => 'array|nullable',
+            ]);
 
-        // Ensure the question belongs to the specified quiz
-        $question = Question::where('id', $questionId)
-            ->where('quiz_id', $quizId)
-            ->firstOrFail();
+            $question = Question::where('id', $questionId)
+                ->where('quiz_id', $quizId)
+                ->firstOrFail();
 
-        // Update the question
-        $question->update($request->all());
+            $question->update($request->all());
 
-        return response()->json(['message' => 'Question updated successfully.', 'question' => $question]);
+            return ResponseHelper::success('Question updated successfully.', $question);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Question not found for the specified quiz.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while updating the question.', $e->getMessage());
+        }
     }
 
-    public function deleteAllQuestion($quizid)
+    public function deleteAllQuestion($quizId)
     {
-        $quiz = Activity::where('id',$quizid)
-            ->where('type', 'quiz')
-            ->with('questions')
-            ->firstOrFail();
-        $quiz->questions()->delete();
-        return response()->json(['message'=> 'Questions deleted successfully.']);
+        try {
+            $quiz = Activity::where('id', $quizId)
+                ->where('type', 'quiz')
+                ->with('questions')
+                ->firstOrFail();
+
+            $quiz->questions()->delete();
+
+            return ResponseHelper::success('All questions deleted successfully.');
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Quiz not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while deleting all questions.', $e->getMessage());
+        }
     }
 
     public function deleteSpecificQuestion($quizId, $questionId)
     {
-        $question = Question::where('id',$questionId)
-                    ->where('quiz_id', $quizId)
-                    ->firstOrFail();
-        $question->delete();
-        return response()->json(['message' => 'Question deleted successfully.']);
-    }
+        try {
+            $question = Question::where('id', $questionId)
+                ->where('quiz_id', $quizId)
+                ->firstOrFail();
 
+            $question->delete();
+
+            return ResponseHelper::success('Question deleted successfully.');
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Question not found for the specified quiz.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while deleting the question.', $e->getMessage());
+        }
+    }
 }

@@ -32,4 +32,12 @@ class Activity extends Model
     {
         return $this->hasMany(Question::class, 'quiz_id'); // One quiz has many questions
     }
+
+    public function participants()
+    {
+        return $this->belongsToMany(PortalUser::class, 'participants', 'activity_id', 'user_id')
+            ->withPivot('submission', 'marks', 'is_done')
+            ->withTimestamps();
+    }
+
 }

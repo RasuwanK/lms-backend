@@ -7,7 +7,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\ParticipateController;
 use App\Http\Controllers\PortalUserController;
+use App\Http\Controllers\TopicController;
 use App\Models\PortalUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,8 +46,25 @@ use Illuminate\Support\Facades\Route;
         Route::patch('v1/announcements/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'updateAnswer'])->middleware('auth:sanctum');
         Route::delete('v1/announcements/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'deleteAnswer'])->middleware('auth:sanctum');
 
+    Route::post('v1/activities/{activityId}/submit', [ParticipateController::class, 'submitActivity']);
+    Route::get('v1/activities/{activityId}/submissions', [ParticipateController::class, 'fetchSubmissions']);
+    Route::patch('v1/activities/{activityId}/submissions/{userId}/grade', [ParticipateController::class, 'gradeSubmission']);
 
-    Route::post('/v1/quiz/{id}/questions',[ActivityController::class,'addQuestion']);
+    Route::post('v1/modules/{moduleid}/topics',[ModuleController::class,'addTopic']);
+    Route::get('v1/modules/{moduleid}/topics',[ModuleController::class,'getTopics']);
+    Route::patch('v1/modules/{moduleid}/topic/{topicid}',[ModuleController::class,'updateTopic']);
+    Route::delete('v1/modules/{moduleid}/topic/{topicid}',[ModuleController::class,'deleteTopic']);
+
+    Route::post('v1/topics/{topicid}/materials',[ModuleController::class, 'addLectureMaterial']);
+    Route::get('v1/topics/{topicid}/materials',[ModuleController::class, 'getLectureMaterials']);
+    Route::patch('v1/topics/{topicid}/materials/{materialsid}',[TopicController::class,'updateMaterials']);
+    Route::delete('v1/topics/{topicid}/materials/{materialsid}',[TopicController::class,'deleteMaterials']);
+    Route::patch('v1/topics/{topicid}/toggle-visibility',[TopicController::class,'toggleVisibility']);
+    Route::patch('v1/topics/{topicid}/mark-complete',[TopicController::class,'markAsComplete']);
+
+
+
+Route::post('/v1/quiz/{id}/questions',[ActivityController::class,'addQuestion']);
     Route::get('/v1/quiz/{id}/questions',[ActivityController::class,'getQuestions']);
     Route::patch('/v1/quiz/{id}/questions/{queid}',[ActivityController::class,'updateQuestion']);
     Route::delete('/v1/quiz/{id}/questions/{queid}',[ActivityController::class,'deleteSpecificQuestion']);

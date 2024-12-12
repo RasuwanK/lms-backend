@@ -7,10 +7,12 @@ use App\Models\Activity;
 use App\Models\Announcement;
 use App\Models\Module;
 use App\Models\PortalUser;
+use App\Models\Topic;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ModuleController extends Controller
 {
@@ -104,156 +106,369 @@ class ModuleController extends Controller
 
     public function getAllAssignments($id)
     {
-        $assignments = Activity::where('module_id', $id)
-            ->where('type', 'assignment')
-            ->get();
-        return response()->json($assignments);
+        try {
+            $assignments = Activity::where('module_id', $id)
+                ->where('type', 'assignment')
+                ->get();
+
+            return ResponseHelper::success('Assignments retrieved successfully.', $assignments);
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while retrieving assignments.', $e->getMessage());
+        }
     }
 
     public function getAllQuizes($id)
     {
-        $assignments = Activity::where('module_id', $id)
-            ->where('type', 'quiz')
-            ->get();
-        return response()->json($assignments);
+        try {
+            $quizzes = Activity::where('module_id', $id)
+                ->where('type', 'quiz')
+                ->get();
+
+            return ResponseHelper::success('Quizzes retrieved successfully.', $quizzes);
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while retrieving quizzes.', $e->getMessage());
+        }
     }
 
     public function getAllActivitiesForAModule($id)
     {
-        $module = Module::with('activities')->findOrFail($id); // Fetch module and its activities
-        return response()->json($module->activities);
+        try {
+            $module = Module::with('activities')->findOrFail($id);
+
+            return ResponseHelper::success('Activities retrieved successfully.', $module->activities);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Module not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while retrieving activities.', $e->getMessage());
+        }
     }
 
     public function getActivity($id, $activity_id)
     {
-        $module = Module::find($id); // Fetch module and its activities
-        $activity = $module->activities->findOrFail($activity_id);
-        return response()->json($activity);
+        try {
+            $module = Module::findOrFail($id);
+            $activity = $module->activities->findOrFail($activity_id);
+
+            return ResponseHelper::success('Activity retrieved successfully.', $activity);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Module or Activity not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while retrieving the activity.', $e->getMessage());
+        }
     }
 
     public function deleteActivity($id, $activity_id)
     {
-        $module = Module::find($id); // Fetch module and its activities
-        $activity = $module->activities->findOrFail($activity_id);
-        $activity->delete();
-        return response()->json($activity);
+        try {
+            $module = Module::findOrFail($id);
+            $activity = $module->activities->findOrFail($activity_id);
+
+            $activity->delete();
+
+            return ResponseHelper::success('Activity deleted successfully.');
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Module or Activity not found.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while deleting the activity.', $e->getMessage());
+        }
     }
 
     public function updateActivity(Request $request, $id, $activity_id)
     {
-        $module = Module::find($id); // Fetch module and its activities
-        $activity = $module->activities->findOrFail($activity_id);
-        $activity->update($request->all());
-        return response()->json($activity);
+        try {
+            $module = Module::findOrFail($id);
+            $activity = $module->activities->findOrFail($activity_id);
+
+            $activity->update($request->all());
+
+            return ResponseHelper::success('Activity updated successfully.', $activity);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::notFound('Module or Activity not found.');
+        } catch (ValidationException $e) {
+            return ResponseHelper::validationError('Validation failed.', $e->errors());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError('An error occurred while updating the activity.', $e->getMessage());
+        }
     }
+
 
     public function addAssignment(Request $request, $id)
     {
-        $module = Module::with('courses')->findOrFail($id);
+        try {
+            $module = Module::with('courses')->findOrFail($id);
 
-        $activity = $module->activities()->create([
-            'activity_name' => $request->activity_name,
-            'type' => 'assignment',
-            'start_date' => $request->start_date,
-            'start_time' => $request->start_time,
-            'end_date' => $request->end_date,
-            'end_time' => $request->end_time,
-            'instructions' => $request->instructions,
-        ]);
+            $activity = $module->activities()->create([
+                'activity_name' => $request->activity_name,
+                'type' => 'assignment',
+                'start_date' => $request->start_date,
+                'start_time' => $request->start_time,
+                'end_date' => $request->end_date,
+                'end_time' => $request->end_time,
+                'instructions' => $request->instructions,
+            ]);
 
-        $event = $activity->events()->create([
-            'event_name' => $activity->activity_name,
-            'start_date' => $activity->start_date,
-            'start_time' => $activity->start_time,
-            'end_date' => $activity->end_date,
-            'end_time' => $activity->end_time,
-            'description' => $activity->description,
-            'status' => 'scheduled',
-        ]);
-        $userids = $module->courses->flatMap(function ($course) {
-            return $course->users->pluck('id');
-        })->unique();
+            $event = $activity->events()->create([
+                'event_name' => $activity->activity_name,
+                'start_date' => $activity->start_date,
+                'start_time' => $activity->start_time,
+                'end_date' => $activity->end_date,
+                'end_time' => $activity->end_time,
+                'description' => $activity->instructions,
+                'status' => 'scheduled',
+            ]);
 
-        $event->users()->attach($userids);
-        return response()->json(['activity' => $activity, 'event' => $event], 201);
+            $userids = $module->courses->flatMap(function ($course) {
+                return $course->users->pluck('id');
+            })->unique();
+
+            $event->users()->attach($userids);
+
+            return ResponseHelper::success('Assignment added successfully.', [
+                'activity' => $activity,
+                'event' => $event,
+            ], 201);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Module not found.', 404);
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while adding the assignment.', 500, $e->getMessage());
+        }
     }
+
 
     public function addQuiz(Request $request, $id)
     {
-        $module = Module::with('courses')->findOrFail($id);
+        try {
+            $module = Module::with('courses')->findOrFail($id);
 
-        $activity = $module->activities()->create([
-            'activity_name' => $request->activity_name,
-            'type' => 'quiz',
-            'start_date' => $request->start_date,
-            'start_time' => $request->start_time,
-            'end_date' => $request->end_date,
-            'end_time' => $request->end_time,
-            'question_count' => $request->question_count,
-        ]);
-        $event = $activity->events()->create([
-            'event_name' => $activity->activity_name,
-            'start_date' => $activity->start_date,
-            'start_time' => $activity->start_time,
-            'end_date' => $activity->end_date,
-            'end_time' => $activity->end_time,
-            'description' => $activity->description,
-            'status' => 'scheduled',
-        ]);
-        $userids = $module->courses->flatMap(function ($course) {  //assign all users who are enrolled in this module
-            return $course->users->pluck('id');                    // no matter which course
-        })->unique();
+            $activity = $module->activities()->create([
+                'activity_name' => $request->activity_name,
+                'type' => 'quiz',
+                'start_date' => $request->start_date,
+                'start_time' => $request->start_time,
+                'end_date' => $request->end_date,
+                'end_time' => $request->end_time,
+                'question_count' => $request->question_count,
+            ]);
 
-        $event->users()->attach($userids);
-        return response()->json(['activity' => $activity, 'event' => $event], 201);
+            $event = $activity->events()->create([
+                'event_name' => $activity->activity_name,
+                'start_date' => $activity->start_date,
+                'start_time' => $activity->start_time,
+                'end_date' => $activity->end_date,
+                'end_time' => $activity->end_time,
+                'description' => $activity->instructions ?? 'Quiz description.',
+                'status' => 'scheduled',
+            ]);
+
+            $userids = $module->courses->flatMap(function ($course) {
+                return $course->users->pluck('id');
+            })->unique();
+
+            $event->users()->attach($userids);
+
+            return ResponseHelper::success('Quiz added successfully.', [
+                'activity' => $activity,
+                'event' => $event,
+            ], 201);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Module not found.', 404);
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while adding the quiz.', 500, $e->getMessage());
+        }
     }
+
 
     public function createAnnouncement(Request $request, $moduleId)
     {
-        $module = Module::findOrFail($moduleId);
+        try {
+            $module = Module::findOrFail($moduleId);
 
-        $request->validate([
-            'topic' => 'required|string|max:255',
-            'description' => 'required|string',
-        ]);
+            $request->validate([
+                'topic' => 'required|string|max:255',
+                'description' => 'required|string',
+            ]);
 
-        $announcement = $module->announcements()->create([
-            'topic' => $request->topic,
-            'description' => $request->description,
-        ]);
+            $announcement = $module->announcements()->create([
+                'topic' => $request->topic,
+                'description' => $request->description,
+            ]);
 
-        return response()->json(['message' => 'Announcement created successfully.', 'announcement' => $announcement], 201);
+            return ResponseHelper::success('Announcement created successfully.', $announcement, 201);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Module not found.', 404);
+        } catch (ValidationException $e) {
+            return ResponseHelper::validationError('Validation failed.', $e->errors());
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while creating the announcement.', 500, $e->getMessage());
+        }
     }
+
 
     public function getAnnouncements($moduleId)
     {
-        $module = Module::with('announcements')->findOrFail($moduleId);
+        try {
+            $module = Module::with('announcements')->findOrFail($moduleId);
 
-        return response()->json($module->announcements);
+            return ResponseHelper::success('Announcements retrieved successfully.', $module->announcements, 200);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Module not found.', 404);
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while retrieving the announcements.', 500, $e->getMessage());
+        }
     }
+
 
     public function updateAnnouncement(Request $request, $announcementId)
     {
-        $announcement = Announcement::findOrFail($announcementId);
+        try {
+            $announcement = Announcement::findOrFail($announcementId);
 
-        $request->validate([
-            'topic' => 'string|max:255|nullable',
-            'description' => 'string|nullable',
-        ]);
+            $request->validate([
+                'topic' => 'string|max:255|nullable',
+                'description' => 'string|nullable',
+            ]);
 
-        $announcement->update($request->only('topic', 'description'));
+            $announcement->update($request->only('topic', 'description'));
 
-        return response()->json(['message' => 'Announcement updated successfully.', 'announcement' => $announcement]);
+            return ResponseHelper::success('Announcement updated successfully.', $announcement, 200);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Announcement not found.', 404);
+        } catch (ValidationException $e) {
+            return ResponseHelper::validationError('Validation failed.', $e->errors());
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while updating the announcement.', 500, $e->getMessage());
+        }
     }
 
     public function deleteAnnouncement($announcementId)
     {
-        $announcement = Announcement::findOrFail($announcementId);
+        try {
+            $announcement = Announcement::findOrFail($announcementId);
+            $announcement->delete();
 
-        $announcement->delete();
-
-        return response()->json(['message' => 'Announcement deleted successfully.']);
+            return ResponseHelper::success('Announcement deleted successfully.', [], 200);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::error('Announcement not found.', 404);
+        } catch (Exception $e) {
+            return ResponseHelper::error('An error occurred while deleting the announcement.', 500, $e->getMessage());
+        }
     }
+
+    public function addTopic(Request $request, $moduleId)
+    {
+        try {
+            $module = Module::findOrFail($moduleId);
+
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'type' => 'nullable|string|in:lecture,assignment,quiz', // Restrict to valid types
+                'is_visible' => 'nullable|boolean',
+            ]);
+
+            $topic = $module->topics()->create([
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'type' => $validated['type'],
+                'is_visible' => $validated['is_visible'] ?? true, // Default to true if not provided
+            ]);
+
+            return ResponseHelper::success('Topic created successfully.', $topic);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function addLectureMaterial(Request $request, $topicId)
+    {
+        try {
+            $topic = Topic::findOrFail($topicId);
+
+            $validated = $request->validate([
+                'material_type' => 'required|string|in:document,video,link', // Restrict to specific types
+                'material_title' => 'required|string|max:255',
+                'material_url' => 'nullable|string',
+            ]);
+
+            $material = $topic->lectureMaterials()->create([
+                'material_type' => $validated['material_type'],
+                'material_title' => $validated['material_title'],
+                'material_url' => $validated['material_url'],
+            ]);
+
+            return ResponseHelper::success('Lecture Material added successfully.', $material);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function getTopics($moduleId)
+    {
+        try {
+            $module = Module::with('topics')->findOrFail($moduleId);
+            return ResponseHelper::success('Topics retrieved successfully.', $module->topics);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function getLectureMaterials($topicId)
+    {
+        try {
+            $topic = Topic::with('lectureMaterials')->findOrFail($topicId);
+            return ResponseHelper::success('Lecture Materials retrieved successfully.', $topic->lectureMaterials);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function updateTopic(Request $request, $moduleId, $topicId)
+    {
+        try {
+            $topic = Topic::where('id', $topicId)
+                ->where('module_id', $moduleId)
+                ->firstOrFail();
+
+            $validated = $request->validate([
+                'title' => 'sometimes|string|max:255',
+                'description' => 'nullable|string',
+                'type' => 'nullable|string|in:lecture,assignment,quiz',
+                'is_visible' => 'nullable|boolean',
+            ]);
+
+            $topic->update($validated);
+
+            return ResponseHelper::success('Topic updated successfully.', [
+                'topic' => $topic,
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function deleteTopic($moduleId, $topicId)
+    {
+        try {
+            $topic = Topic::where('id', $topicId)
+                ->where('module_id', $moduleId)
+                ->firstOrFail();
+
+            $topic->delete();
+
+            return ResponseHelper::success('Topic deleted successfully.');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
 
 }
 
