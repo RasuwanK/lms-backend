@@ -72,5 +72,7 @@ return new class extends Migration
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('courses');
+        Schema::dropIfExists('departments');
+        Schema::dropIfExists('events');
     }
 };
