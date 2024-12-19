@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function signin(Request $request)
     {
         try {
             $request->validate([
@@ -27,13 +27,17 @@ class AuthController extends Controller
             }
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            return ResponseHelper::success('Login successful', ['user' => $user, 'token' => $token,]);
+            return ResponseHelper::success('Login successful', 
+            [
+                'user' => $user, 
+                'token' => $token,
+            ]);
         } catch (Exception $e) {
             return ResponseHelper::serverError('An error occurred while logging in.', $e->getMessage());
         }
     }
 
-    public function logout(Request $request)
+    public function signout(Request $request)
     {
         try {
             // Revoke all tokens associated with the user
@@ -41,12 +45,12 @@ class AuthController extends Controller
 
             return ResponseHelper::success('Logged out successfully.');
         } catch (Exception $e) {
-            return ResponseHelper::serverError('An error occurred while logging out.', $e->getMessage());
+            return ResponseHelper::serverError('An error occurred while logging out.' . $e->getMessage());
         }
     }
 
 
-    public function register(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    public function signup(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         // Only allow POST requests
         if (!$request->isMethod('post')) {

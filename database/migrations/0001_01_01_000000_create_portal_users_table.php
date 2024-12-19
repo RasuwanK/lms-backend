@@ -11,6 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+
+        Schema::create('courses', function (Blueprint $table) {
+            $table->id();
+            $table->string('course_name');
+            $table->integer('credit_value')->nullable();
+            $table->integer('maximum_students')->nullable();
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
         Schema::create('portal_users', function (Blueprint $table) {
             $table->id(); // Auto-increment primary key
             $table->string('Full_name'); // Full name
@@ -30,31 +53,14 @@ return new class extends Migration
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('set null');
         });
 
-
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('id')->constrained('portal_users');
             $table->string('title');
             $table->text('description');
             $table->dateTime('event_date');
             $table->timestamps();
         });
-
     }
 
     /**
@@ -62,8 +68,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('portal_users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('courses');
     }
 };

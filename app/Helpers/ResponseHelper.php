@@ -119,4 +119,14 @@ class ResponseHelper
 			null	
 		), 500);
 	}
+
+	public static function unauthorized($message = null)
+	{
+		return response()->json(ResponseHelper::template(
+			$message == null ? "Unauthorized" : $message,
+			false,
+			null,
+			null	
+		), 401);
+	}
 }
