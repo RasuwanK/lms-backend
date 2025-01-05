@@ -25,6 +25,7 @@ Route::prefix('api')->group(function () {
         return response()->json(['token' => $token], 200);
     });
 
+    // Related to version 1.0
     Route::prefix('/v1')->group(function () {
 
         // Modules related
