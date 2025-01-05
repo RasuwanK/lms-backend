@@ -45,6 +45,10 @@ Route::prefix('api')->group(function () {
             Route::delete('/{id}/activities/{activityid}', [ModuleController::class, 'deleteActivity']);
             Route::post('/{id}/announcements', [ModuleController::class, 'createAnnouncement']);
             Route::get('/{id}/announcements', [ModuleController::class, 'getAnnouncements']);
+            Route::post('/{moduleid}/topics', [ModuleController::class, 'addTopic']);
+            Route::get('/{moduleid}/topics', [ModuleController::class, 'getTopics']);
+            Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
+            Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
         });
 
         // Announcements related
@@ -62,13 +66,6 @@ Route::prefix('api')->group(function () {
             Route::post('/{activityId}/submit', [ParticipateController::class, 'submitActivity']);
             Route::get('{activityId}/submissions', [ParticipateController::class, 'fetchSubmissions']);
             Route::patch('/{activityId}/submissions/{userId}/grade', [ParticipateController::class, 'gradeSubmission']);
-        });
-
-        Route::prefix('/modules')->group(function () {
-            Route::post('/{moduleid}/topics', [ModuleController::class, 'addTopic']);
-            Route::get('/{moduleid}/topics', [ModuleController::class, 'getTopics']);
-            Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
-            Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
         });
 
         // Topics related
