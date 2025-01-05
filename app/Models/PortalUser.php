@@ -12,7 +12,7 @@ class PortalUser extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\PortalUserFactory> */
     use HasFactory,HasApiTokens,Notifiable;
-    protected $table = 'portal_users';
+    protected $table = 'portal_user';
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -49,6 +49,4 @@ class PortalUser extends Authenticatable
             ->withPivot('submission', 'marks', 'is_done')
             ->withTimestamps();
     }
-
-
 }
