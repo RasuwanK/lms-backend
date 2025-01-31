@@ -12,7 +12,7 @@ class PortalUser extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\PortalUserFactory> */
     use HasFactory,HasApiTokens,Notifiable;
-    protected $table = 'portal_user';
+    protected $table = 'portal_users';
     protected $primaryKey = 'id';
 
     protected $fillable = [

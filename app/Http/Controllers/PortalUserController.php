@@ -43,7 +43,7 @@ class PortalUserController extends Controller
         $email = $request->input('email');
         $mobile = $request->input('mobile_no');
         $address = $request->input('address');
-        $institution = $request->input('institution');
+        //$institution = $request->input('institution');
         $password = $request->input('password');
         $role = $request->input('role');
         $status = $request->input('status');
@@ -58,10 +58,10 @@ class PortalUserController extends Controller
                 'Email' => $email,
                 'Mobile_No' => $mobile,
                 'Address' => $address,
-                'Institution' => $institution,
+                //'Institution' => $institution,
                 'Profile_Picture' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&s',
                 'Password' => $password,
-                'Role' => $role,
+                'Role' => 'student',
                 'Status' => $status,
                 'Course_Id' => $course_id
             ]);

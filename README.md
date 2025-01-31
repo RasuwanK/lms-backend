@@ -58,4 +58,11 @@ Need to start in order to check and run api routes
 php artisan serve
 ```
 
+## Important considerations
+
+- NEVER change database schema with mysql. Only change it through laravel database migrations. Refer this [link](https://laravel.com/docs/11.x/migrations#generating-migrations)
+
+## Backend API structure (Enpoints)
+
+### Users
 

@@ -30,9 +30,8 @@ class AddPortalUserRequest extends FormRequest
             'age' => 'required|integer',
             'mobile_no' => 'required|string|max:50',
             'address' => 'required|string|max:255',
-            'institution' => 'required|string|max:255',
             'password' => 'required|string|max:255',
-            'status' => 'required|string|max:20',
+            'status' => 'required|integer|max:1',
             'course_id' => 'required|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Max resolution is set here
         ];
@@ -47,7 +46,7 @@ class AddPortalUserRequest extends FormRequest
             'age.required' => 'Age is required',
             'mobile_no.required' => 'Mobile number is required',
             'address.required' => 'Address is required',
-            'institution.required' => 'Institution is required',
+            //'institution.required' => 'Institution is required',
             'password.required' => 'Password is required',
             'status.required' => 'Status is required',
             'course_id.required' => 'Course ID is required',
@@ -58,7 +57,7 @@ class AddPortalUserRequest extends FormRequest
             'email.max' => 'Email must not exceed 255 characters',
             'mobile_no.max' => 'Mobile number must not exceed 50 characters',
             'address.max' => 'Address must not exceed 255 characters',
-            'institution.max' => 'Institution must not exceed 255 characters',
+            //'institution.max' => 'Institution must not exceed 255 characters',
             'password.max' => 'Password must not exceed 255 characters',
             'status.max' => 'Status must not exceed 20 characters',
             'course_id.max' => 'Course ID must not exceed 255 characters',
