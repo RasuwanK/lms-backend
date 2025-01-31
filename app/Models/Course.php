@@ -17,6 +17,7 @@ class Course extends Model
         'course_name',
         'credit_value',
         'maximum_students',
+        'description'
     ];
     // Define the relationship with Module
 //    public function module()

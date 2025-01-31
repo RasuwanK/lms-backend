@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\CreateCourseRequest;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+use Exception;
 
 class CourseController extends Controller
 {
@@ -48,6 +51,40 @@ class CourseController extends Controller
         }
 
         return ResponseHelper::success('Course fetched successfully', $course);
+    }
+
+    public function createCourse(CreateCourseRequest $request)
+    {
+        // Only submission is via form
+        if (!$request->accepts('multipart/form-data')) {
+            return ResponseHelper::invalidMedia();
+        }
+
+        // Only allow POST requests
+        if (!$request->isMethod('post')) {
+            return ResponseHelper::methodInvalid();
+        }
+
+        $course_name = $request->input('course_name');
+        $description = $request->input('description');
+        $credit_value = $request->input('credit_value');
+        $maximum_students = $request->input('maximum_students');
+        
+        try {
+            $course = Course::create([
+                'course_name' => $course_name,
+                'description' => $description,
+                'credit_value' => $credit_value,
+                'maximum_students' => $maximum_students
+            ]);
+
+            return ResponseHelper::success('Course created successfully', $course);
+        } catch(QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            // When a general server exception has occured
+            return ResponseHelper::serverError($e->getMessage());
+        }
     }
 
 

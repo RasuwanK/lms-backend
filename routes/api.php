@@ -93,10 +93,15 @@ Route::prefix('/v1')->group(function () {
         Route::delete('/{eventid}', [EventController::class, 'deleteEvent']);
     });
 
+    // Handling courses
     Route::prefix('/courses')->group(function () {
-        Route::get('v1/courses/{id}/modules', [CourseController::class, 'listModules']);
-        Route::post('v1/courses/{id}/modules', [CourseController::class, 'attachModules']);
-        Route::delete('v1/courses/{id}/modules', [CourseController::class, 'detachModules']);
+        Route::get('/{id}/modules', [CourseController::class, 'listModules']);
+        Route::post('/{id}/modules', [CourseController::class, 'attachModules']);
+        Route::delete('/{id}/modules', [CourseController::class, 'detachModules']);
+        Route::post('/', [CourseController::class, 'createCourse']);
+        Route::fallback(function () {
+                return "Invalid course operation";
+        });
     });
 
     // User API
@@ -141,10 +146,7 @@ Route::prefix('/v1')->group(function () {
 
     // Course API
     Route::prefix('courses')->group(function () {
-        Route::get('/{id}', [CourseController::class, 'getCourseById']);
-        Route::fallback(function () {
-            return "Invalid course operation";
-        });
+        
     });
 
     Route::fallback(function () {
