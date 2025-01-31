@@ -13,12 +13,12 @@ Corresponding frontend can be found in this [repo](https://github.com/sunhesh12/
 Go inside the folder containing the repository
 
 ```
-	cd lms-backend
+cd lms-backend
 ```
 
 Install the dependencies using composer
 ```
-	composer install
+composer install
 ```
 ### Add the environment variables (.env)
 
@@ -29,10 +29,10 @@ Copy it into the folder containing the repository.
 change the followig variables as given
 
 ```
-	DB_CONNECTION=mysql
-	DB_DATABASE=lms_backend
-	DB_USERNAME=root
-	DB_PASSWORD=root
+DB_CONNECTION=mysql
+DB_DATABASE=lms_backend
+DB_USERNAME=root
+DB_PASSWORD=root
 ```
 If this doesen't work check the username and password of your mysql database and set DB_USERNAME and DB_PASSWORD accordingly
 
@@ -41,21 +41,21 @@ If this doesen't work check the username and password of your mysql database and
 Execute the following command
 
 ```
-	php artisan generate:key
+php artisan generate:key
 ```
 ### Run all the database migrations
 
 Need to create the table structures in the mysql database 'lms_backend'
 
 ```
-	php artisan migrate
+php artisan migrate
 ```
 ### Start the development server
 
 Need to start in order to check and run api routes
 
 ```
-	php artisan serve
+php artisan serve
 ```
 
 
