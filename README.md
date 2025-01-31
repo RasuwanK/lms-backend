@@ -2,6 +2,31 @@
 This is the repository of the backend used by the Learning management system.
 Corresponding frontend can be found in this [repo](https://github.com/sunhesh12/GroupProjectFrontend).
 
+## API Documentation
+
+## Table of Contents
+- [How to start development](#how-to-start-development)
+  - [Install Laravel](#install-laravel)
+  - [Installing dependencies](#installing-dependencies)
+  - [Add the environment variables (.env)](#add-the-environment-variables-env)
+  - [Generate the App Key](#generate-the-app-key-app_key-environment-variable)
+  - [Run all the database migrations](#run-all-the-database-migrations)
+  - [Start the development server](#start-the-development-server)
+  - [Important considerations](#important-considerations)
+- [Authentication](#authentication)
+- [Modules API](#modules-api)
+- [Announcements API](#announcements-api)
+- [Activities API](#activities-api)
+- [Topics API](#topics-api)
+- [Quiz API](#quiz-api)
+- [Events API](#events-api)
+- [Courses API](#courses-api)
+- [User API](#user-api)
+- [Authentication API](#authentication-api)
+- [API Endpoints Summary](#api-endpoints-summary)
+
+
+
 ## How to start development
 
 ### Install Laravel
@@ -61,29 +86,6 @@ php artisan serve
 ## Important considerations
 
 - NEVER change database schema with MySQL. Only change it through Laravel database migrations. Refer to this [link](https://laravel.com/docs/11.x/migrations#generating-migrations)
-
-## API Documentation
-
-## Table of Contents
-- [How to start development](#how-to-start-development)
-  - [Install Laravel](#install-laravel)
-  - [Installing dependencies](#installing-dependencies)
-  - [Add the environment variables (.env)](#add-the-environment-variables-env)
-  - [Generate the App Key](#generate-the-app-key-app_key-environment-variable)
-  - [Run all the database migrations](#run-all-the-database-migrations)
-  - [Start the development server](#start-the-development-server)
-  - [Important considerations](#important-considerations)
-- [Authentication](#authentication)
-- [Modules API](#modules-api)
-- [Announcements API](#announcements-api)
-- [Activities API](#activities-api)
-- [Topics API](#topics-api)
-- [Quiz API](#quiz-api)
-- [Events API](#events-api)
-- [Courses API](#courses-api)
-- [User API](#user-api)
-- [Authentication API](#authentication-api)
-- [API Endpoints Summary](#api-endpoints-summary)
 
 ### **Quiz API**
 
