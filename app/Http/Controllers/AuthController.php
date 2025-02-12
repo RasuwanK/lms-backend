@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPortalUserRequest;
+use App\Http\Requests\SignInRequest;
 use App\Models\PortalUser;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -12,14 +13,9 @@ use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
-    public function signin(Request $request)
+    public function signin(SignInRequest $request)
     {
         try {
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
-
             $user = PortalUser::where('email', $request->email)->first();
 
             if (!$user) {
@@ -33,7 +29,7 @@ class AuthController extends Controller
                 'token' => $token,
             ]);
         } catch (Exception $e) {
-            return ResponseHelper::serverError('An error occurred while logging in.', $e->getMessage());
+            return ResponseHelper::serverError('An error occurred while logging in.' . $e->getMessage());
         }
     }
 
