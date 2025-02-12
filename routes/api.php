@@ -122,7 +122,7 @@ Route::prefix('/v1')->group(function () {
     //    Route::post('/v1/modules',[ModuleController::class,'addModule']);
     //    Route::patch('/v1/modules/{id}',[ModuleController::class,'updateModuleById']);
     //    Route::delete('/v1/modules/{id}',[ModuleController::class,'deleteModuleById']);
-    Route::prefix('v1')->group(function () {
+    Route::prefix('/auth')->group(function () {
         Route::post('/signin', [AuthController::class, 'signin']);
         Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
         Route::post('/signup', [AuthController::class, 'signup']);
