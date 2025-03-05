@@ -70,7 +70,7 @@ class AuthController extends Controller
         //$institution = $request->input('institution');
         $password = $request->input('password');
         $role = $request->input('role');
-        $status = $request->input('status');
+        $status = '1';
         $course_id = $request->input('course_id');
         $profile_picture = $request->file('profile_picture');
 
