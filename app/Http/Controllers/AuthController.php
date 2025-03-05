@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPortalUserRequest;
+use App\Http\Controllers\PortalUserController;
 use App\Http\Requests\SignInRequest;
 use App\Models\PortalUser;
 use Exception;
@@ -13,6 +14,7 @@ use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
+
     public function signin(SignInRequest $request)
     {
         try {
@@ -23,11 +25,13 @@ class AuthController extends Controller
             }
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            return ResponseHelper::success('Login successful', 
-            [
-                'user' => $user, 
-                'token' => $token,
-            ]);
+            return ResponseHelper::success(
+                'Login successful',
+                [
+                    'user' => $user,
+                    'token' => $token,
+                ]
+            );
         } catch (Exception $e) {
             return ResponseHelper::serverError('An error occurred while logging in.' . $e->getMessage());
         }
@@ -48,35 +52,40 @@ class AuthController extends Controller
 
     public function signup(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
+        // Only submission is via form
+        if (!$request->accepts('multipart/form-data')) {
+            return ResponseHelper::invalidMedia();
+        }
+
         // Only allow POST requests
         if (!$request->isMethod('post')) {
             return ResponseHelper::methodInvalid();
         }
-        // Extract the validated data
+        // Must be sent via a form submission
         $full_name = $request->input('full_name');
         $age = $request->input('age');
         $email = $request->input('email');
         $mobile = $request->input('mobile_no');
         $address = $request->input('address');
-        $institution = $request->input('institution');
+        //$institution = $request->input('institution');
         $password = $request->input('password');
         $role = $request->input('role');
         $status = $request->input('status');
         $course_id = $request->input('course_id');
-        $profile_picture = $request->file('profile_picture'); // This will be handled by the AddPortalUserRequest validation
+        $profile_picture = $request->file('profile_picture');
 
+        // Create a new user
         try {
-            // Create the user
             $user = PortalUser::create([
                 'Full_Name' => $full_name,
                 'Age' => $age,
                 'Email' => $email,
                 'Mobile_No' => $mobile,
                 'Address' => $address,
-                'Institution' => $institution,
+                //'Institution' => $institution,
                 'Profile_Picture' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&s',
                 'Password' => $password,
-                'Role' => $role,
+                'Role' => 'student',
                 'Status' => $status,
                 'Course_Id' => $course_id
             ]);
@@ -85,17 +94,15 @@ class AuthController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
             $user->courses()->attach($request->course_id);
 
-            // Return success response
-            return ResponseHelper::success('Registration successful and enrolled', [
+            return ResponseHelper::success('User created successfully', [
                 'user' => $user,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
+                'token' => $token,
             ]);
         } catch (QueryException $qe) {
-            // Handle database query exceptions
+            // When a db query exception has occured
             return ResponseHelper::serverError($qe->getMessage());
         } catch (Exception $e) {
-            // Handle general exceptions
+            // When a general server exception has occured
             return ResponseHelper::serverError($e->getMessage());
         }
     }

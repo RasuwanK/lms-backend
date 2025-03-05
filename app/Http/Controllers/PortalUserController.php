@@ -26,6 +26,33 @@ class PortalUserController extends Controller
             return ResponseHelper::serverError($e->getMessage());
         }
     }
+
+    public function students(Request $request)
+    {
+        try {
+            $users = PortalUser::where("Role", "=", "student")->get(); // Fetch all users
+
+            // Use the ResponseHelper to return a success response
+            return ResponseHelper::success('Students retrieved successfully', $users);
+        } catch (Exception $e) {
+            // Catch any general exceptions and use ResponseHelper for error response
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function lecturers(Request $request)
+    {
+        try {
+            $users = PortalUser::where("Role","=", "lecturer")->get(); // Fetch all users
+
+            // Use the ResponseHelper to return a success response
+            return ResponseHelper::success('Students retrieved successfully', $users);
+        } catch (Exception $e) {
+            // Catch any general exceptions and use ResponseHelper for error response
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
     public function create(AddPortalUserRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         // Only submission is via form
@@ -176,7 +203,7 @@ class PortalUserController extends Controller
     public function read($id)
     {
         try {
-            $user = PortalUser::find( $id);
+            $user = PortalUser::find($id);
             if(!$user) {
                 return ResponseHelper::notFound('User not found');
             }

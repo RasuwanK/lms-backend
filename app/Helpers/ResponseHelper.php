@@ -14,13 +14,14 @@ class ResponseHelper
 	 *
 	 * @return array The response template including version, payload, message, and success status.
 	 */
-	public static function template($message, $isSuccess = true, $data = null, $errors=null)
+	public static function template($message, $status ,$isSuccess = true, $data = null, $errors=null)
 	{
 		return [
 			"version" => config('app.version'),
 			"payload" => $data,
 			"message" => $message,
 			"success" => $isSuccess,
+			"status" => $status,
 			"errors" => $errors
 		];
 	}
@@ -36,6 +37,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message,
+			200,
 			true,
 			$data
 		), 200);
@@ -53,6 +55,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Api route requested is not available" : $message,
+			404,
 			false,
 		), 404);
 	}
@@ -69,7 +72,8 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Invalid method" : $message,
-			false
+			404,
+			false,
 		), 404);
 	}
 
@@ -86,6 +90,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Invalid media type" : $message,
+			404,
 			false,
 		), 415);
 	}
@@ -104,6 +109,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Invalid request" : $message,
+			422,
 			false,
 			null,
 			$validationErrors	
@@ -114,6 +120,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Error with the database" : $message,
+			500,
 			false,
 			null,
 			null	
@@ -124,6 +131,7 @@ class ResponseHelper
 	{
 		return response()->json(ResponseHelper::template(
 			$message == null ? "Unauthorized" : $message,
+			401,
 			false,
 			null,
 			null	

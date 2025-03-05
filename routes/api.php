@@ -53,7 +53,7 @@ Route::prefix('/v1')->group(function () {
     Route::prefix('/announcements')->group(function () {
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
         Route::delete('/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
-        Route::post('/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
+        //Route::post(uri: '/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
         Route::get('/{announcementid}/answers', [AnnouncementController::class, 'getAnswers']);
         Route::patch('/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'updateAnswer'])->middleware('auth:sanctum');
         Route::delete('/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'deleteAnswer'])->middleware('auth:sanctum');
@@ -100,7 +100,7 @@ Route::prefix('/v1')->group(function () {
         Route::delete('/{id}/modules', [CourseController::class, 'detachModules']);
         Route::post('/', [CourseController::class, 'createCourse']);
         Route::fallback(function () {
-                return "Invalid course operation";
+            return "Invalid course operation";
         });
     });
 
@@ -110,11 +110,19 @@ Route::prefix('/v1')->group(function () {
         Route::get('/test', function () {
             return ResponseHelper::success("Testing user API");
         });
-        Route::get('/all', [PortalUserController::class, 'all']);
+        Route::get('/', [PortalUserController::class, 'all']);
+        Route::get('/students', [PortalUserController::class, 'students']);
+        Route::get('/lecturers', [PortalUserController::class, 'lecturers']);
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
         Route::get('/{id}', [PortalUserController::class, 'read']);
+
+        Route::prefix('/auth')->group(function () {
+            Route::post('/signin', [AuthController::class, 'signin']);
+            Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
+            Route::post('/signup', [AuthController::class, 'signup']);
+        });
     });
 
     //    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);
@@ -122,11 +130,7 @@ Route::prefix('/v1')->group(function () {
     //    Route::post('/v1/modules',[ModuleController::class,'addModule']);
     //    Route::patch('/v1/modules/{id}',[ModuleController::class,'updateModuleById']);
     //    Route::delete('/v1/modules/{id}',[ModuleController::class,'deleteModuleById']);
-    Route::prefix('/auth')->group(function () {
-        Route::post('/signin', [AuthController::class, 'signin']);
-        Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
-        Route::post('/signup', [AuthController::class, 'signup']);
-    });
+
 
     // Routes are beginning with /v1
     Route::prefix('v1')->group(function () {
@@ -145,9 +149,7 @@ Route::prefix('/v1')->group(function () {
     });
 
     // Course API
-    Route::prefix('courses')->group(function () {
-        
-    });
+    Route::prefix('courses')->group(function () {});
 
     Route::fallback(function () {
         return ResponseHelper::notFound("Invalid api operation");

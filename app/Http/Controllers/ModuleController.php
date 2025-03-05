@@ -21,7 +21,7 @@ class ModuleController extends Controller
     public function showAllModules(Request $request)
     {
         try {
-            $modules = Module::all(); // Fetch all users
+            $modules = Module::with('courses')->get(); // Fetch all modules
 
             // Use the ResponseHelper to return a success response
             return ResponseHelper::success('Modules retrieved successfully', $modules);

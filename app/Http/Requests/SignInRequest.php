@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\ResponseHelper;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class SignInRequest extends FormRequest
 {
@@ -25,5 +28,12 @@ class SignInRequest extends FormRequest
             'email' => 'required|email',
             'password' => 'required'
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ResponseHelper::invalid($validator->errors()->all(), "Error while validating request")
+        );
     }
 }
