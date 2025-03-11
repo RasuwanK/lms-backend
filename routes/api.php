@@ -117,6 +117,9 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
         Route::get('/{id}', [PortalUserController::class, 'read']);
+        Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
+        Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
+
 
         Route::prefix('/auth')->group(function () {
             Route::post('/signin', [AuthController::class, 'signin']);

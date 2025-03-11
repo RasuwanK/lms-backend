@@ -112,7 +112,7 @@ class ResponseHelper
 			422,
 			false,
 			null,
-			$validationErrors	
+			$validationErrors
 		), 422);
 	}
 
@@ -123,7 +123,7 @@ class ResponseHelper
 			500,
 			false,
 			null,
-			null	
+			null
 		), 500);
 	}
 
@@ -134,7 +134,18 @@ class ResponseHelper
 			401,
 			false,
 			null,
-			null	
+			null
 		), 401);
 	}
+
+    public static function error($message = null, $statusCode = 400)
+    {
+        return response()->json(ResponseHelper::template(
+            $message == null ? "An error occurred" : $message,
+            $statusCode,
+            false,
+            null,
+            null
+        ), $statusCode);
+    }
 }
