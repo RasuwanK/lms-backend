@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParticipateController;
 use App\Http\Controllers\PortalUserController;
 use App\Http\Controllers\TopicController;
@@ -26,6 +27,7 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
 // Related to version 1.0
 Route::prefix('/v1')->group(function () {
 
+    Route::get('/notifications/{id}',[NotificationController::class, 'index']);
     // Modules related
     Route::prefix('/modules')->group(function () {
         Route::get('/', [ModuleController::class, 'showAllModules']);

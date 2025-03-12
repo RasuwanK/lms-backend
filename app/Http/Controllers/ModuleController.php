@@ -8,11 +8,14 @@ use App\Models\Announcement;
 use App\Models\Module;
 use App\Models\PortalUser;
 use App\Models\Topic;
+use App\Notifications\ActivityCreated;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ModuleController extends Controller
 {
@@ -55,7 +58,7 @@ class ModuleController extends Controller
                 'credit_value' => 'nullable|integer',
                 'practical_exam_count' => 'nullable|integer',
                 'writing_exam_count' => 'nullable|integer',
-                'course_id' => 'required|exists:courses,id',
+                //'course_id' => 'required|exists:courses,id',
             ]);
             $module = Module::create($validated);
             return ResponseHelper::success('Module created successfully', $module);
@@ -221,7 +224,17 @@ class ModuleController extends Controller
                 return $course->users->pluck('id');
             })->unique();
 
-            $event->users()->attach($userids);
+            $event->users()->attach($userids, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            if ($event) {
+                $users = $event->users;
+                foreach ($users as $user) {
+                    $user->notify(new ActivityCreated($activity));
+                }
+            }
 
             return ResponseHelper::success('Assignment added successfully.', [
                 'activity' => $activity,
@@ -264,7 +277,17 @@ class ModuleController extends Controller
                 return $course->users->pluck('id');
             })->unique();
 
-            $event->users()->attach($userids);
+            $event->users()->attach($userids, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            if ($event) {
+                $users = $event->users;
+                foreach ($users as $user) {
+                    $user->notify(new ActivityCreated($activity));
+                }
+            }
 
             return ResponseHelper::success('Quiz added successfully.', [
                 'activity' => $activity,
