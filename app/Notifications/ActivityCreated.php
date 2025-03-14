@@ -20,7 +20,7 @@ class ActivityCreated extends Notification implements ShouldQueue
 
     public function via(): array
     {
-        return ['database']; // Store in DB and broadcast real-time
+        return ['database','broadcast']; // Store in DB and broadcast real-time
     }
 
     public function toArray(): array

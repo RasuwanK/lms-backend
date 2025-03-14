@@ -13,8 +13,15 @@ use App\Http\Controllers\PortalUserController;
 use App\Http\Controllers\TopicController;
 use App\Models\PortalUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
+//Broadcast::channel('App.Models.PortalUser.{id}', function ($user,$id) {
+//    return (int) $user->id === (int) $id;
+//});
+//Broadcast::channel('activities', function () {
+//    return true;
+//});
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
     if (!$user) {
