@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Mail\ActivityCreatedMail;
 use App\Models\Activity;
 use App\Models\Announcement;
 use App\Models\Module;
@@ -13,6 +14,7 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -232,9 +234,14 @@ class ModuleController extends Controller
             if ($event) {
                 $users = $event->users;
                 foreach ($users as $user) {
+                    Log::info('Notifying user', ['user_id' => $user->id, 'email' => $user->Email]);
                     $user->notify(new ActivityCreated($activity));
+                    Mail::to($user->Email)->send(new ActivityCreatedMail($activity));
                 }
             }
+
+
+
 
             return ResponseHelper::success('Assignment added successfully.', [
                 'activity' => $activity,
@@ -285,7 +292,9 @@ class ModuleController extends Controller
             if ($event) {
                 $users = $event->users;
                 foreach ($users as $user) {
+                    Log::info('Notifying user', ['user_id' => $user->id, 'email' => $user->Email]);
                     $user->notify(new ActivityCreated($activity));
+                    Mail::to($user->Email)->send(new ActivityCreatedMail($activity));
                 }
             }
 

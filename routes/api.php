@@ -11,17 +11,25 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParticipateController;
 use App\Http\Controllers\PortalUserController;
 use App\Http\Controllers\TopicController;
+use App\Models\Activity;
 use App\Models\PortalUser;
+use App\Notifications\ActivityCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 use Illuminate\Support\Facades\Route;
 
-//Broadcast::channel('App.Models.PortalUser.{id}', function ($user,$id) {
-//    return (int) $user->id === (int) $id;
-//});
-//Broadcast::channel('activities', function () {
-//    return true;
-//});
+
+Route::get('/send-test-email', function () {
+    $subject = 'Test Email Subject';
+    $content = 'This is a test email content.';
+
+    Mail::to('recipient@example.com')->queue(new Testmail($subject, $content));
+
+    return 'Test email sent successfully!';
+});
+
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
     if (!$user) {

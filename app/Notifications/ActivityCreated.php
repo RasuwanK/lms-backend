@@ -2,10 +2,16 @@
 
 namespace App\Notifications;
 
+
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
 
 class ActivityCreated extends Notification implements ShouldQueue
 {
@@ -20,7 +26,7 @@ class ActivityCreated extends Notification implements ShouldQueue
 
     public function via(): array
     {
-        return ['database','broadcast']; // Store in DB and broadcast real-time
+        return ['mail','broadcast','database']; // Store in DB and broadcast real-time
     }
 
     public function toArray(): array
@@ -31,4 +37,5 @@ class ActivityCreated extends Notification implements ShouldQueue
             'event_id' => $this->activity->events->id
         ];
     }
+
 }

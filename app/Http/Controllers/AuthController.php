@@ -6,11 +6,13 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPortalUserRequest;
 use App\Http\Controllers\PortalUserController;
 use App\Http\Requests\SignInRequest;
+use App\Mail\SigninMail;
 use App\Models\PortalUser;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -24,7 +26,7 @@ class AuthController extends Controller
                 return ResponseHelper::unauthorized('Invalid credentials');
             }
             $token = $user->createToken('auth_token')->plainTextToken;
-
+            Mail::to($user->Email)->send(new SignInMail('New Sign from your account', 'welcome'));
             return ResponseHelper::success(
                 'Login successful',
                 [
