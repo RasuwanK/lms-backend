@@ -50,16 +50,16 @@ return new class extends Migration
         // Portal Users Table
         Schema::create('portal_users', function (Blueprint $table) {
             $table->id(); // Auto-increment primary key
-            $table->string('Full_name'); // Full name
+            $table->string('full_name'); // Full name
             $table->unsignedTinyInteger('Age')->nullable(); // Age (unsigned, optional)
-            $table->string('Email')->unique(); // Email (unique and required)
-            $table->string('Mobile_No', 15)->unique()->nullable(); // Mobile number (optional and unique)
-            $table->text('Address')->nullable(); // Address (optional)
-            $table->string('Institution')->nullable(); // Institution name (optional)
-            $table->string('Profile_Picture')->nullable(); // Profile picture URL
-            $table->string('Password'); // Password (hashed)
-            $table->string('Role'); // User role (e.g., admin, student, etc.)
-            $table->boolean('Status')->default(1); // Status (active by default)
+            $table->string('email')->unique(); // Email (unique and required)
+            $table->string('mobile_no', 15)->unique()->nullable(); // Mobile number (optional and unique)
+            $table->text('address')->nullable(); // Address (optional)
+            $table->string('institution')->nullable(); // Institution name (optional)
+            $table->string('profile_picture')->nullable(); // Profile picture URL
+            $table->string('password'); // Password (hashed)
+            $table->string('role'); // User role (e.g., admin, student, etc.)
+            $table->boolean('status')->default(1); // Status (active by default)
             $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null'); // Foreign key
             $table->timestamps(); // Created at and updated at fields
         });

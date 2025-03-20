@@ -14,7 +14,7 @@ class CourseController extends Controller
     public function listModules($course_id)
     {
         $course=Course::find($course_id);
-        return ResponseHelper::success($course->modules);
+        return ResponseHelper::success("Modules returned successfully",$course->modules);
     }
 
     public function attachModules(Request $request, $course_id)
@@ -23,7 +23,7 @@ class CourseController extends Controller
         $moduleIds = $request->module_ids; // Expecting an array of module IDs
         $course->modules()->attach($moduleIds);
 
-        return ResponseHelper::success($course->modules);
+        return ResponseHelper::success("Module attached successfully", $course->modules);
     }
 
     public function detachModules(Request $request, $course_id)

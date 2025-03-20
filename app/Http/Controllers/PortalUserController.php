@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
@@ -80,17 +79,17 @@ class PortalUserController extends Controller
         // Create a new user
         try {
             $user = PortalUser::create([
-                'Full_Name' => $full_name,
-                'Age' => $age,
-                'Email' => $email,
-                'Mobile_No' => $mobile,
-                'Address' => $address,
+                'full_Name' => $full_name,
+                'age' => $age,
+                'email' => $email,
+                'mobile_no' => $mobile,
+                'address' => $address,
                 //'Institution' => $institution,
-                'Profile_Picture' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&s',
-                'Password' => $password,
-                'Role' => 'student',
-                'Status' => $status,
-                'Course_Id' => $course_id
+                'profile_picture' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&s',
+                'password' => $password,
+                'role' => 'student',
+                'status' => $status,
+                'course_id' => $course_id
             ]);
             return ResponseHelper::success('User created successfully', $user);
         } catch (QueryException $qe) {
@@ -117,88 +116,116 @@ class PortalUserController extends Controller
     }
 
     public function update($id, UpdatePortalUserRequest $request)
-    {
-        // Only submission is via form
-        if (!$request->accepts('application/json')) {
-            return ResponseHelper::invalidMedia();
-        }
-
-        // Only allow POST requests
-        if (!$request->isMethod('patch')) {
-            return ResponseHelper::methodInvalid();
-        }
-
-        // Must be sent via a form submission
-        $full_name = $request->json('full_name');
-        $age = $request->json('age');
-        $email = $request->json('email');
-        $mobile = $request->json('mobile_no');
-        $address = $request->json('address');
-        $institution = $request->json('institution');
-        $password = $request->json('password');
-        $role = $request->json('role');
-        $status = $request->json('status');
-        $course_id = $request->json('course_id');
-        // TODO: Need to implement profile picture
-        $profile_picture = $request->file('profile_picture');
-
-        // Create a new user
-        try {
-            $user = PortalUser::findOrFail($id);
-            if (!$user) {
-                return ResponseHelper::notFound('User not found');
-            }
-            if ($full_name) {
-                $user->Full_name = $full_name;
-            }
-
-            if ($age) {
-                $user->Age = $age;
-            }
-
-            if ($email) {
-                $user->Email = $email;
-            }
-
-            if ($mobile) {
-                $user->Mobile_No = $mobile;
-            }
-
-            if ($address) {
-                $user->Address = $address;
-            }
-
-            if ($institution) {
-                $user->Institution = $institution;
-            }
-
-            if ($password) {
-                $user->Password = $password;
-            }
-
-            if ($role) {
-                $user->Role = $role;
-            }
-
-            if ($status) {
-                $user->Status = $status;
-            }
-
-            if ($course_id) {
-                $user->Course_Id = $course_id;
-            }
-
-            $user->save();
-
-            return ResponseHelper::success('User updated successfully', $user);
-        } catch (QueryException $qe) {
-            // When a db query exception has occured
-            return ResponseHelper::serverError($qe->getMessage());
-        } catch (Exception $e) {
-            // When a general server exception has occured
-            return ResponseHelper::serverError($e->getMessage());
-        }
+{
+    // Ensure JSON is accepted
+    if (!$request->accepts('application/json')) {
+        return ResponseHelper::invalidMedia();
     }
+
+    // Only allow PATCH requests
+    if (!$request->isMethod('patch')) {
+        return ResponseHelper::methodInvalid();
+    }
+
+    try {
+        $usersData = $request->json()->all();
+
+        // Check if the request is updating multiple users
+        if (isset($usersData[0]) && is_array($usersData[0])) {
+            // Batch update logic
+            $updatedUsers = [];
+
+            foreach ($usersData as $userData) {
+                $user = PortalUser::find($userData['id']);
+                if (!$user) {
+                    continue;
+                }
+
+                if (isset($userData['full_name'])) {
+                    $user->full_name = $userData['full_name'];
+                }
+                if (isset($userData['age'])) {
+                    $user->age = $userData['age'];
+                }
+                if (isset($userData['email'])) {
+                    $user->email = $userData['email'];
+                }
+                if (isset($userData['mobile_no'])) {
+                    $user->mobile_no = $userData['mobile_no'];
+                }
+                if (isset($userData['address'])) {
+                    $user->address = $userData['address'];
+                }
+                if (isset($userData['institution'])) {
+                    $user->institution = $userData['institution'];
+                }
+                if (isset($userData['password'])) {
+                    $user->password = bcrypt($userData['password']);
+                }
+                if (isset($userData['role'])) {
+                    $user->role = $userData['role'];
+                }
+                if (isset($userData['status'])) {
+                    $user->status = $userData['status'];
+                }
+                if (isset($userData['course_id'])) {
+                    $user->course_id = $userData['course_id'];
+                }
+
+                $user->save();
+                $updatedUsers[] = $user;
+            }
+
+            return ResponseHelper::success('Users updated successfully', $updatedUsers);
+        }
+
+        // Single user update logic
+        $user = PortalUser::findOrFail($id);
+        if (!$user) {
+            return ResponseHelper::notFound('User not found');
+        }
+
+        if ($request->json('full_name')) {
+            $user->full_name = $request->json('full_name');
+        }
+        if ($request->json('age')) {
+            $user->age = $request->json('age');
+        }
+        if ($request->json('email')) {
+            $user->email = $request->json('email');
+        }
+        if ($request->json('mobile_no')) {
+            $user->mobile_no = $request->json('mobile_no');
+        }
+        if ($request->json('address')) {
+            $user->address = $request->json('address');
+        }
+        if ($request->json('institution')) {
+            $user->institution = $request->json('institution');
+        }
+        if ($request->json('password')) {
+            $user->password = bcrypt($request->json('password'));
+        }
+        if ($request->json('role')) {
+            $user->role = $request->json('role');
+        }
+        if ($request->json('status')) {
+            $user->status = $request->json('status');
+        }
+        if ($request->json('course_id')) {
+            $user->course_id = $request->json('course_id');
+        }
+
+        $user->save();
+
+        return ResponseHelper::success('User updated successfully', $user);
+    } catch (QueryException $qe) {
+        return ResponseHelper::serverError($qe->getMessage());
+    } catch (Exception $e) {
+        return ResponseHelper::serverError($e->getMessage());
+    }
+}
+
 
     public function read($id)
     {

@@ -34,7 +34,7 @@ class ModuleController extends Controller
     public function getModuleById(Request $request, $id)
     {
         try {
-            $module = Module::find($id); // Fetch all users
+            $module = Module::with('activities')->get()->where('id', '=', $id)->first(); // Fetch all users
             if (!$module) {
                 // Return a not found error if the module doesn't exist
                 return ResponseHelper::notFound('Module not found');
@@ -226,11 +226,11 @@ class ModuleController extends Controller
             return ResponseHelper::success('Assignment added successfully.', [
                 'activity' => $activity,
                 'event' => $event,
-            ], 201);
+            ]);
         } catch (ModelNotFoundException $e) {
-            return ResponseHelper::error('Module not found.', 404);
+            return ResponseHelper::notFound('Module not found.');
         } catch (Exception $e) {
-            return ResponseHelper::error('An error occurred while adding the assignment.', 500, $e->getMessage());
+            return ResponseHelper::serverError('An error occurred while adding the assignment.\n'.$e->getMessage());
         }
     }
 
