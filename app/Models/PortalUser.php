@@ -21,7 +21,6 @@ class PortalUser extends Authenticatable
         'Email',
         'Mobile_No',
         'Address',
-        'Institution',
         'Password',
         'Role',
         'Status',

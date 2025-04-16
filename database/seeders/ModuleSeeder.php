@@ -13,7 +13,7 @@ class ModuleSeeder extends Seeder
     {
         // Make sure there are some courses and portal users first
         $courses = Course::all();
-        $teachers = PortalUser::all();
+        $teachers = PortalUser::where('Role', '=', 'lecturer')->get();
 
         // Optional check to avoid running without related data
         if ($courses->isEmpty() || $teachers->isEmpty()) {
@@ -33,7 +33,7 @@ class ModuleSeeder extends Seeder
             ]);
 
             // Attach 1–3 random teachers
-            $module->teachers()->attach($teachers->random(rand(1, 3))->pluck('id')->toArray());
+            $module->teachers()->attach($teachers->random(rand(1, 2))->pluck('id')->toArray());
         }
     }
 }
