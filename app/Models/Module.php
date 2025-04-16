@@ -14,7 +14,6 @@ class Module extends Model
         'credit_value',
         'practical_exam_count',
         'writing_exam_count',
-        'course_id'
     ];
 
     // Define the relationship with Course
