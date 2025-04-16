@@ -33,6 +33,7 @@ class ModuleSeeder extends Seeder
             ]);
 
             // Attach 1–3 random teachers
+            $module->courses()->attach($course->id);
             $module->teachers()->attach($teachers->random(rand(1, 2))->pluck('id')->toArray());
         }
     }
