@@ -45,8 +45,14 @@ class Module extends Model
         return $this->hasMany(Announcement::class);
     }
 
-    public function topics()
+    public function topics()  
     {
         return $this->hasMany(Topic::class);
+    }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(PortalUser::class, 'teaches', 'module_id', 'user_id')
+            ->withTimestamps();
     }
 }

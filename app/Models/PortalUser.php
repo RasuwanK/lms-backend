@@ -49,4 +49,10 @@ class PortalUser extends Authenticatable
             ->withPivot('submission', 'marks', 'is_done')
             ->withTimestamps();
     }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'teaches', 'user_id', 'module_id')
+            ->withTimestamps();
+    }
 }
