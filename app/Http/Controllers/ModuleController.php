@@ -34,7 +34,7 @@ class ModuleController extends Controller
     public function getModuleById(Request $request, $id)
     {
         try {
-            $module = Module::with(['activities', 'topics', 'teachers', 'announcements'])->get()->where('id', '=', $id)->first(); // Fetch all users
+            $module = Module::with(['activities', 'topics.lectureMaterials', 'teachers', 'announcements'])->get()->where('id', '=', $id)->first(); // Fetch all users
             if (!$module) {
                 // Return a not found error if the module doesn't exist
                 return ResponseHelper::notFound('Module not found');

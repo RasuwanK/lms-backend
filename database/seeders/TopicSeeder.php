@@ -10,7 +10,6 @@ class TopicSeeder extends Seeder
 {
     public function run()
     {
-        // Ensure at least one module exists
         $moduleIds = Module::pluck('id')->toArray();
 
         if (empty($moduleIds)) {
@@ -18,34 +17,49 @@ class TopicSeeder extends Seeder
             return;
         }
 
-        $topics = [
-            [
-                'title' => 'Introduction to Programming',
-                'description' => 'Basic programming concepts using Python.',
-                'type' => 'Lecture',
-                'is_visible' => true,
-                'is_complete' => false,
-            ],
-            [
-                'title' => 'Database Design',
-                'description' => 'ER models, normalization, and SQL fundamentals.',
-                'type' => 'Lecture',
-                'is_visible' => true,
-                'is_complete' => true,
-            ],
-            [
-                'title' => 'Software Testing Techniques',
-                'description' => 'Covers unit testing, integration testing, and automation tools.',
-                'type' => 'Lecture',
-                'is_visible' => true,
-                'is_complete' => false,
-            ]
+        $sampleTitles = [
+            'Introduction to Programming',
+            'Database Design',
+            'Software Testing Techniques',
+            'Agile Methodologies',
+            'Version Control with Git',
+            'Web Development Basics',
+            'Data Structures and Algorithms',
+            'Operating Systems Overview',
+            'Computer Networks',
+            'Security Fundamentals',
+            'Object-Oriented Programming',
+            'Mobile App Development',
+            'API Development and REST',
+            'Frontend Frameworks',
+            'Backend Development with Laravel',
+            'Machine Learning Basics',
+            'UI/UX Principles',
+            'Cloud Computing',
+            'DevOps Practices',
+            'Deployment Strategies',
+            'Software Maintenance',
+            'Debugging Techniques',
+            'Big Data Introduction',
+            'Cybersecurity Essentials',
+            'Blockchain Basics'
         ];
 
-        foreach ($topics as $topic) {
-            Topic::create(array_merge($topic, [
+        $types = ['Lecture', 'Tutorial', 'Lab', 'Workshop'];
+
+        $topicCount = rand(20, 40);
+
+        for ($i = 1; $i <= $topicCount; $i++) {
+            Topic::create([
+                'title' => fake()->unique()->randomElement($sampleTitles),
+                'description' => fake()->sentence(8),
+                'type' => fake()->randomElement($types),
+                'is_visible' => fake()->boolean(80), // 80% chance true
+                'is_complete' => fake()->boolean(50),
                 'module_id' => fake()->randomElement($moduleIds)
-            ]));
+            ]);
         }
+
+        $this->command->info("Seeded $topicCount topics across " . count($moduleIds) . " modules.");
     }
 }

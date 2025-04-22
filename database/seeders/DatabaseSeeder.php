@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             PortalUserSeeder::class,
             ModuleSeeder::class,
             TopicSeeder::class,
+            LectureMaterialSeeder::class,
         ]);
     }
 }

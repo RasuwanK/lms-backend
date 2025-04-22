@@ -15,6 +15,13 @@ class Topic extends Model
         'is_visible',
         'is_complete'
     ];
+
+    protected $table = 'topics';
+    public function course()
+    {
+        $this->belongsTo(Course::class);
+    }
+
     public function module()
     {
         $this->belongsTo(Module::class);
