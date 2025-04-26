@@ -117,6 +117,7 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
         Route::get('/{id}', [PortalUserController::class, 'read']);
+        Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
         Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
 

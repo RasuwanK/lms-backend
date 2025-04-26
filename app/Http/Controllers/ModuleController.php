@@ -16,8 +16,6 @@ use Illuminate\Validation\ValidationException;
 
 class ModuleController extends Controller
 {
-
-
     public function showAllModules(Request $request)
     {
         try {

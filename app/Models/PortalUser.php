@@ -16,6 +16,7 @@ class PortalUser extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'Id',
         'Full_Name',
         'Age',
         'Email',
@@ -49,7 +50,7 @@ class PortalUser extends Authenticatable
             ->withTimestamps();
     }
 
-    public function modules()
+    public function teaches()
     {
         return $this->belongsToMany(Module::class, 'teaches', 'user_id', 'module_id')
             ->withTimestamps();

@@ -26,6 +26,24 @@ class PortalUserController extends Controller
         }
     }
 
+    public function getTeachingModules(Request $request, $id)
+    {
+        try {
+            $user = PortalUser::find($id);
+
+            if(!$user) return ResponseHelper::notFound('User not found');
+
+            $modules = $user->teaches->makeHidden('pivot');
+
+            // Use the ResponseHelper to return a success response
+            return ResponseHelper::success('Modules retrieved successfully', $modules);
+        } catch (Exception $e) {
+            // Catch any general exceptions and use ResponseHelper for error response
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+
     public function students(Request $request)
     {
         try {
