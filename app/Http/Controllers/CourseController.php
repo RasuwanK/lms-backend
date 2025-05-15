@@ -14,6 +14,11 @@ class CourseController extends Controller
     public function listModules($course_id)
     {
         $course=Course::find($course_id);
+
+        if(!$course) {
+            return ResponseHelper::notFound('Course not found');
+        }
+        
         return ResponseHelper::success("Modules returned successfully",$course->modules);
     }
 
