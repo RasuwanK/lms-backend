@@ -111,6 +111,9 @@ Route::prefix('/v1')->group(function () {
             return ResponseHelper::success("Testing user API");
         });
         Route::get('/', [PortalUserController::class, 'all']);
+        Route::get('/{id}/enrolled/modules', [PortalUserController::class, 'getEnrolledModules']);
+        Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
+        
         Route::get('/students', [PortalUserController::class, 'students']);
         Route::get('/lecturers', [PortalUserController::class, 'lecturers']);
         Route::post('/', [PortalUserController::class, 'create']);
@@ -119,7 +122,7 @@ Route::prefix('/v1')->group(function () {
         Route::get('/{id}', [PortalUserController::class, 'read']);
         Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
-
+        Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
 
         Route::prefix('/auth')->group(function () {
             Route::post('/signin', [AuthController::class, 'signin']);

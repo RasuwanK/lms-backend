@@ -226,6 +226,18 @@ class PortalUserController extends Controller
     }
 }
 
+    public function getTeachingModules($userId)
+    {
+        
+    $user = PortalUser::find($userId);
+
+    if (!$user) {
+        return ResponseHelper::notFound('User not found');
+    }
+
+    $modules = $user->teaches()->with('courses')->get();
+        return ResponseHelper::success('User course fetched successfully', $modules);
+    }
 
     public function read($id)
     {

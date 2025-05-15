@@ -49,7 +49,7 @@ class PortalUser extends Authenticatable
             ->withTimestamps();
     }
 
-    public function modules()
+    public function teaches()
     {
         return $this->belongsToMany(Module::class, 'teaches', 'user_id', 'module_id')
             ->withTimestamps();
