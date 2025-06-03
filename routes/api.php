@@ -110,6 +110,11 @@ Route::prefix('/v1')->group(function () {
         Route::get('/test', function () {
             return ResponseHelper::success("Testing user API");
         });
+        Route::prefix('/auth')->group(function () {
+            Route::post('/signin', [AuthController::class, 'signin']);
+            Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
+            Route::post('/signup', [AuthController::class, 'signup']);
+        });
         Route::get('/', [PortalUserController::class, 'all']);
         Route::get('/{id}/enrolled/modules', [PortalUserController::class, 'getEnrolledModules']);
         Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
@@ -119,16 +124,10 @@ Route::prefix('/v1')->group(function () {
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
-        Route::get('/{id}', [PortalUserController::class, 'read']);
+        Route::get('/{id}', [PortalUserController::class, 'read'])->middleware('auth:sanctum');
         Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
         Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
-
-        Route::prefix('/auth')->group(function () {
-            Route::post('/signin', [AuthController::class, 'signin']);
-            Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
-            Route::post('/signup', [AuthController::class, 'signup']);
-        });
     });
 
     //    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);

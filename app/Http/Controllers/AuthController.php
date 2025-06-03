@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPortalUserRequest;
 use App\Http\Controllers\PortalUserController;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\SignInRequest;
 use App\Models\PortalUser;
 use Exception;
@@ -18,20 +19,21 @@ class AuthController extends Controller
     public function signin(SignInRequest $request)
     {
         try {
-            $user = PortalUser::where('email', $request->email)->first();
+            $user = PortalUser::where('email', $request->input('email'))->first();
 
-            if (!$user) {
-                return ResponseHelper::unauthorized('Invalid credentials');
+            if ($user && Hash::check($request->input('password'), $user->password)) {
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return ResponseHelper::success(
+                    'Login successful',
+                    [
+                        'user' => $user,
+                        'token' => $token,
+                    ]
+                );
             }
-            $token = $user->createToken('auth_token')->plainTextToken;
 
-            return ResponseHelper::success(
-                'Login successful',
-                [
-                    'user' => $user,
-                    'token' => $token,
-                ]
-            );
+            return ResponseHelper::notFound("Invalid credentials");
         } catch (Exception $e) {
             return ResponseHelper::serverError('An error occurred while logging in.' . $e->getMessage());
         }
@@ -77,7 +79,7 @@ class AuthController extends Controller
         // Create a new user
         try {
             $user = PortalUser::create([
-                'Full_Name' => $full_name,
+                'ull_Name' => $full_name,
                 'Age' => $age,
                 'Email' => $email,
                 'Mobile_No' => $mobile,
