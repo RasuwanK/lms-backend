@@ -116,7 +116,7 @@ Route::prefix('/v1')->group(function () {
             Route::post('/signup', [AuthController::class, 'signup']);
         });
         Route::get('/', [PortalUserController::class, 'all']);
-        Route::get('/{id}/enrolled/modules', [PortalUserController::class, 'getEnrolledModules']);
+        Route::get('/{id}/enrolled/modules', action: [PortalUserController::class, 'getEnrolledModules']);
         Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
         
         Route::get('/students', [PortalUserController::class, 'students']);
@@ -124,7 +124,9 @@ Route::prefix('/v1')->group(function () {
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
+        
         Route::get('/{id}', [PortalUserController::class, 'read'])->middleware('auth:sanctum');
+        
         Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
         Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
@@ -144,7 +146,7 @@ Route::prefix('/v1')->group(function () {
         });
 
         // Event Routes
-        Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
+        Route::get('/{id}/courses', action: [PortalUserController::class, 'getUserCourses']);
         Route::get('/{id}/{field}', [PortalUserController::class, 'getFilteredInfo']);
         Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
 

@@ -33,7 +33,7 @@ class AuthController extends Controller
                 );
             }
 
-            return ResponseHelper::notFound("Invalid credentials");
+            return ResponseHelper::unauthorized("Invalid credentials");
         } catch (Exception $e) {
             return ResponseHelper::serverError('An error occurred while logging in.' . $e->getMessage());
         }

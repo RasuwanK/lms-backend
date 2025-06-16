@@ -16,6 +16,8 @@ class Module extends Model
         'writing_exam_count',
     ];
 
+    protected $hidden = ['pivot'];
+
     // Define the relationship with Course
     public function course()
     {

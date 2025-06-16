@@ -47,7 +47,8 @@ class TopicSeeder extends Seeder
 
         $types = ['Lecture', 'Tutorial', 'Lab', 'Workshop'];
 
-        $topicCount = rand(20, 40);
+        $topicCount = min(rand(20, 40), count($sampleTitles));
+
 
         for ($i = 1; $i <= $topicCount; $i++) {
             Topic::create([

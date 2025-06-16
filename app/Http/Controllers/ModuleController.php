@@ -9,6 +9,7 @@ use App\Models\Module;
 use App\Models\PortalUser;
 use App\Models\Topic;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -357,7 +358,11 @@ class ModuleController extends Controller
     public function addTopic(Request $request, $moduleId)
     {
         try {
-            $module = Module::findOrFail($moduleId);
+            $module = Module::find($moduleId);
+
+            if(!$module) {
+                return ResponseHelper::notFound("Module not found");
+            }
 
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
