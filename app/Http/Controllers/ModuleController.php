@@ -369,13 +369,15 @@ class ModuleController extends Controller
                 'description' => 'nullable|string',
                 'type' => 'nullable|string|in:lecture,assignment,quiz', // Restrict to valid types
                 'is_visible' => 'nullable|boolean',
-            ]);
+                'deadline' => 'nullable|date_format:Y-m-d H:i:s', // Optional deadline
+            ]);  
 
             $topic = $module->topics()->create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'type' => $validated['type'],
                 'is_visible' => $validated['is_visible'] ?? true, // Default to true if not provided
+                'deadline' => $validated['deadline'] ?? null, // Optional deadline
             ]);
 
             return ResponseHelper::success('Topic created successfully.', $topic);
@@ -393,7 +395,7 @@ class ModuleController extends Controller
 
             $validated = $request->validate([
                 'material_type' => 'required|string|in:document,video,link', // Restrict to specific types
-                'material_title' => 'required|string|max:255',
+                'material_title' => 'required|strin g|max:255',
                 'material_url' => 'nullable|string',
             ]);
 
