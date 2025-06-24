@@ -78,7 +78,12 @@ class ModuleController extends Controller
                 'course_id' => 'sometimes|exists:courses,id',
             ]);
 
-            $module = Module::findOrFail($id);
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
             $module->update($validated);
 
             return ResponseHelper::success('Module updated successfully', $module);
