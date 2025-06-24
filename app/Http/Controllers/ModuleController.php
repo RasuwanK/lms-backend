@@ -369,7 +369,7 @@ class ModuleController extends Controller
                 'description' => 'nullable|string',
                 'type' => 'nullable|string|in:lecture,assignment,quiz', // Restrict to valid types
                 'is_visible' => 'nullable|boolean',
-                'deadline' => 'nullable|date_format:Y-m-d H:i:s', // Optional deadline
+                'deadline' => 'nullable|string', // Optional deadline
             ]);  
 
             $topic = $module->topics()->create([
