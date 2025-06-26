@@ -17,7 +17,29 @@ use Illuminate\Validation\ValidationException;
 
 class ModuleController extends Controller
 {
+    public function archiveModule(Request $request, $id)
+    {
+        try {
 
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
+            $module->update([
+                'achived' => true, // Set archived to true
+            ]);
+
+            return ResponseHelper::success('Module updated successfully', $module);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Module not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
 
     public function showAllModules(Request $request)
     {
@@ -57,6 +79,7 @@ class ModuleController extends Controller
                 'practical_exam_count' => 'nullable|integer',
                 'writing_exam_count' => 'nullable|integer',
                 'course_id' => 'required|exists:courses,id',
+                'archived' => 'boolean', // Optional field for archiving
             ]);
             $module = Module::create($validated);
             return ResponseHelper::success('Module created successfully', $module);
@@ -76,6 +99,7 @@ class ModuleController extends Controller
                 'practical_exam_count' => 'sometimes|nullable|integer',
                 'writing_exam_count' => 'sometimes|nullable|integer',
                 'course_id' => 'sometimes|exists:courses,id',
+                'archived' => 'sometimes|boolean', // Optional field for archiving
             ]);
 
             $module = Module::find($id);
