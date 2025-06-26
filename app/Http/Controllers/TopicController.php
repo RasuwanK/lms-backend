@@ -83,6 +83,31 @@ class TopicController extends Controller
         }
     }
 
+    public function addLectureMaterial(Request $request, $topicId)
+    {
+        try {
+            $topic = Topic::findOrFail($topicId);
+
+            $validated = $request->validate([
+                'material_type' => 'required|string|in:document,video,link', // Restrict to specific types
+                'material_title' => 'required|strin g|max:255',
+                'material_url' => 'nullable|string',
+            ]);
+
+            $material = $topic->lectureMaterials()->create([
+                'material_type' => $validated['material_type'],
+                'material_title' => $validated['material_title'],
+                'material_url' => $validated['material_url'],
+            ]);
+
+            return ResponseHelper::success('Lecture Material added successfully.', $material);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
 
 
 }

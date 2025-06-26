@@ -68,7 +68,7 @@ Route::prefix('/v1')->group(function () {
 
     // Topics related
     Route::prefix('/topics')->group(function () {
-        Route::post('/{topicid}/materials', [ModuleController::class, 'addLectureMaterial']);
+        Route::post('/{topicid}/materials', [TopicController::class, 'addLectureMaterial']);
         Route::get('/{topicid}/materials', [ModuleController::class, 'getLectureMaterials']);
         Route::patch('/{topicid}/materials/{materialsid}', [TopicController::class, 'updateMaterials']);
         Route::delete('/{topicid}/materials/{materialsid}', [TopicController::class, 'deleteMaterials']);
