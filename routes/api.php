@@ -47,7 +47,7 @@ Route::prefix('/v1')->group(function () {
         Route::get('/{moduleid}/topics', [ModuleController::class, 'getTopics']);
         Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
         Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
-        Route::post('/{id}/archive', [ModuleController::class, 'archiveModule']);
+        Route::patch('/{id}/archive', [ModuleController::class, 'archiveModule']);
     });
 
     // Announcements related
