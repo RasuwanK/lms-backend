@@ -28,7 +28,7 @@ class ModuleController extends Controller
             }
 
             $module->update([
-                'achived' => 1, // Set archived to true
+                'achived' => true, // Set archived to true
             ]);
 
             $module->save();
