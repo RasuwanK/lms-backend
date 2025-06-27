@@ -59,7 +59,7 @@ class ModuleController extends Controller
 
             $module->save();
 
-            return ResponseHelper::success('Module archived successfully', null);
+            return ResponseHelper::success('Module unarchived successfully', null);
         } catch (QueryException $qe) {
             return ResponseHelper::serverError($qe->getMessage());
         } catch (ModelNotFoundException $mnfe) {
