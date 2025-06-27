@@ -108,6 +108,58 @@ class TopicController extends Controller
         }
     }
 
+    public function archiveTopic(Request $request, $id)
+    {
+        try {
+
+            $topic = Topic::find($id);
+
+            if (!$topic) {
+                return ResponseHelper::notFound('Topic not found');
+            }
+
+            $topic->update([
+                'archived' => false, // Set archived to true
+            ]);
+
+            $topic->save();
+
+            return ResponseHelper::success('Topic archived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Topic not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function unarchiveTopic(Request $request, $id)
+    {
+        try {
+
+            $topic = Topic::find($id);
+
+            if (!$topic) {
+                return ResponseHelper::notFound('Topic not found');
+            }
+
+            $topic->update([
+                'archived' => false, // Set archived to true
+            ]);
+
+            $topic->save();
+
+            return ResponseHelper::success('Topic unarchived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Topic not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
 
 
 }

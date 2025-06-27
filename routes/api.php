@@ -48,7 +48,7 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
         Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
         Route::patch('/{id}/archive', [ModuleController::class, 'archiveModule']);
-        Route::patch('/{id}/unarchive', [ModuleController::class, 'archiveModule']);
+        Route::patch('/{id}/unarchive', [ModuleController::class, 'unarchiveModule']);
     });
 
     // Announcements related
@@ -76,6 +76,9 @@ Route::prefix('/v1')->group(function () {
         Route::delete('/{topicid}/materials/{materialsid}', [TopicController::class, 'deleteMaterials']);
         Route::patch('/{topicid}/toggle-visibility', [TopicController::class, 'toggleVisibility']);
         Route::patch('/{topicid}/mark-complete', [TopicController::class, 'markAsComplete']);
+        Route::patch('/{topicid}/archive', [TopicController::class, 'archiveTopic']);
+        Route::patch('/{topicid}/unarchive', [TopicController::class, 'unarchiveTopic']);
+
     });
 
     Route::prefix('/quiz')->group(function () {
