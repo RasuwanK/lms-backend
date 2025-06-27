@@ -28,10 +28,12 @@ class ModuleController extends Controller
             }
 
             $module->update([
-                'achived' => true, // Set archived to true
+                'achived' => 1, // Set archived to true
             ]);
 
-            return ResponseHelper::success('Module updated successfully', $module);
+            $module->save();
+
+            return ResponseHelper::success('Module archived successfully', null);
         } catch (QueryException $qe) {
             return ResponseHelper::serverError($qe->getMessage());
         } catch (ModelNotFoundException $mnfe) {
