@@ -119,7 +119,7 @@ class TopicController extends Controller
             }
 
             $topic->update([
-                'archived' => false, // Set archived to true
+                'is_visible' => false, // Set archived to true
             ]);
 
             $topic->save();
@@ -145,7 +145,7 @@ class TopicController extends Controller
             }
 
             $topic->update([
-                'archived' => false, // Set archived to true
+                'is_visible' => true, // Set archived to true
             ]);
 
             $topic->save();
