@@ -48,6 +48,7 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
         Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
         Route::patch('/{id}/archive', [ModuleController::class, 'archiveModule']);
+        Route::patch('/{id}/unarchive', [ModuleController::class, 'archiveModule']);
     });
 
     // Announcements related
@@ -119,15 +120,15 @@ Route::prefix('/v1')->group(function () {
         Route::get('/', [PortalUserController::class, 'all']);
         Route::get('/{id}/enrolled/modules', action: [PortalUserController::class, 'getEnrolledModules']);
         Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
-        
+
         Route::get('/students', [PortalUserController::class, 'students']);
         Route::get('/lecturers', [PortalUserController::class, 'lecturers']);
         Route::post('/', [PortalUserController::class, 'create']);
         Route::patch('/{id}/', [PortalUserController::class, 'update']);
         Route::delete('/{id}/', [PortalUserController::class, 'delete']);
-        
+
         Route::get('/{id}', [PortalUserController::class, 'read'])->middleware('auth:sanctum');
-        
+
         Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
         Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
         Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);

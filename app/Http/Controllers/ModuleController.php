@@ -28,7 +28,33 @@ class ModuleController extends Controller
             }
 
             $module->update([
-                'achived' => true, // Set archived to true
+                'archived' => true, // Set archived to true
+            ]);
+
+            $module->save();
+
+            return ResponseHelper::success('Module archived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Module not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function unarchiveModule(Request $request, $id)
+    {
+        try {
+
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
+            $module->update([
+                'archived' => false, // Set archived to true
             ]);
 
             $module->save();
