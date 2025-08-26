@@ -77,6 +77,7 @@ Route::prefix('/v1')->group(function () {
     });
 
     Route::prefix('/quiz')->group(function () {
+        // Route::get('/', [ActivityController::class, 'addQuestion']);
         Route::post('/{id}/questions', [ActivityController::class, 'addQuestion']);
         Route::get('/{id}/questions', [ActivityController::class, 'getQuestions']);
         Route::patch('/{id}/questions/{queid}', [ActivityController::class, 'updateQuestion']);
