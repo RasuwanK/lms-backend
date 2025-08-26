@@ -278,7 +278,7 @@ class ModuleController extends Controller
             $userids = $module->courses->flatMap(function ($course) {
                 return $course->users->pluck('id');
             })->unique();
-
+            \Log::info('User IDs to attach:', ['userids' => $userids->toArray()]);
             $event->users()->attach($userids);
 
             return ResponseHelper::success('Assignment added successfully.', [

@@ -34,10 +34,11 @@ class PortalUser extends Authenticatable
     // }
 
     // Each student belongs to one course
-    public function course()
+    public function courses()
     {
-        return $this->belongsTo(Course::class, 'course_id'); // 'Course_Id' is the foreign key in portal_users table
+        return $this->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id');
     }
+
 
     public function events()
     {

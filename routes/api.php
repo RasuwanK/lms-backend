@@ -10,7 +10,10 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ParticipateController;
 use App\Http\Controllers\PortalUserController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
 use App\Models\PortalUser;
+use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,7 +53,15 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{id}/archive', [ModuleController::class, 'archiveModule']);
         Route::patch('/{id}/unarchive', [ModuleController::class, 'unarchiveModule']);
     });
+    Route::middleware('auth:sanctum')->prefix('/messages')->group(function () {
+        Route::post('/conversations', [ConversationController::class, 'create']);   // Create conversation
+        Route::get('/conversations', [ConversationController::class, 'list']);     // List my conversations
+        Route::get('/conversations/{conversation}', [ConversationController::class, 'show']); // Get single convo
 
+        // Messages
+        Route::get('/conversations/{conversation}/messages', [MessageController::class, 'list']); // List messages
+        Route::post('/conversations/{conversation}/messages', [MessageController::class, 'send']); // Send a message
+    });
     // Announcements related
     Route::prefix('/announcements')->group(function () {
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
