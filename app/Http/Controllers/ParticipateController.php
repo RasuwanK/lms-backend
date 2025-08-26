@@ -39,7 +39,7 @@ class ParticipateController extends Controller
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::error('Activity not found.', 404);
         } catch (ValidationException $e) {
-            return ResponseHelper::validationError('Validation failed.', $e->errors());
+            return ResponseHelper::invalid('Validation failed.', $e->errors());
         } catch (Exception $e) {
             return ResponseHelper::error('An error occurred while submitting the activity.', 500, $e->getMessage());
         }

@@ -9,6 +9,7 @@ use App\Models\Module;
 use App\Models\PortalUser;
 use App\Models\Topic;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -16,6 +17,58 @@ use Illuminate\Validation\ValidationException;
 
 class ModuleController extends Controller
 {
+    public function archiveModule(Request $request, $id)
+    {
+        try {
+
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
+            $module->update([
+                'archived' => true, // Set archived to true
+            ]);
+
+            $module->save();
+
+            return ResponseHelper::success('Module archived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Module not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function unarchiveModule(Request $request, $id)
+    {
+        try {
+
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
+            $module->update([
+                'archived' => false, // Set archived to true
+            ]);
+
+            $module->save();
+
+            return ResponseHelper::success('Module unarchived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Module not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
     public function showAllModules(Request $request)
     {
         try {
@@ -54,6 +107,7 @@ class ModuleController extends Controller
                 'practical_exam_count' => 'nullable|integer',
                 'writing_exam_count' => 'nullable|integer',
                 'course_id' => 'required|exists:courses,id',
+                'archived' => 'boolean', // Optional field for archiving
             ]);
             $module = Module::create($validated);
             return ResponseHelper::success('Module created successfully', $module);
@@ -73,9 +127,15 @@ class ModuleController extends Controller
                 'practical_exam_count' => 'sometimes|nullable|integer',
                 'writing_exam_count' => 'sometimes|nullable|integer',
                 'course_id' => 'sometimes|exists:courses,id',
+                'archived' => 'sometimes|boolean', // Optional field for archiving
             ]);
 
-            $module = Module::findOrFail($id);
+            $module = Module::find($id);
+
+            if (!$module) {
+                return ResponseHelper::notFound('Module not found');
+            }
+
             $module->update($validated);
 
             return ResponseHelper::success('Module updated successfully', $module);
@@ -355,20 +415,26 @@ class ModuleController extends Controller
     public function addTopic(Request $request, $moduleId)
     {
         try {
-            $module = Module::findOrFail($moduleId);
+            $module = Module::find($moduleId);
+
+            if(!$module) {
+                return ResponseHelper::notFound("Module not found");
+            }
 
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'type' => 'nullable|string|in:lecture,assignment,quiz', // Restrict to valid types
                 'is_visible' => 'nullable|boolean',
-            ]);
+                'deadline' => 'nullable|string', // Optional deadline
+            ]);  
 
             $topic = $module->topics()->create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'type' => $validated['type'],
                 'is_visible' => $validated['is_visible'] ?? true, // Default to true if not provided
+                'deadline' => $validated['deadline'] ?? null, // Optional deadline
             ]);
 
             return ResponseHelper::success('Topic created successfully.', $topic);
@@ -386,7 +452,7 @@ class ModuleController extends Controller
 
             $validated = $request->validate([
                 'material_type' => 'required|string|in:document,video,link', // Restrict to specific types
-                'material_title' => 'required|string|max:255',
+                'material_title' => 'required|strin g|max:255',
                 'material_url' => 'nullable|string',
             ]);
 

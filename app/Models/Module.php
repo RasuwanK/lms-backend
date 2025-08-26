@@ -14,7 +14,10 @@ class Module extends Model
         'credit_value',
         'practical_exam_count',
         'writing_exam_count',
+        'archived'
     ];
+
+    protected $hidden = ['pivot'];
 
     // Define the relationship with Course
     public function course()

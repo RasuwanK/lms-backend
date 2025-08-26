@@ -83,6 +83,83 @@ class TopicController extends Controller
         }
     }
 
+    public function addLectureMaterial(Request $request, $topicId)
+    {
+        try {
+            $topic = Topic::findOrFail($topicId);
+
+            $validated = $request->validate([
+                'material_type' => 'required|string|in:document,video,link', // Restrict to specific types
+                'material_title' => 'required|strin g|max:255',
+                'material_url' => 'nullable|string',
+            ]);
+
+            $material = $topic->lectureMaterials()->create([
+                'material_type' => $validated['material_type'],
+                'material_title' => $validated['material_title'],
+                'material_url' => $validated['material_url'],
+            ]);
+
+            return ResponseHelper::success('Lecture Material added successfully.', $material);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function archiveTopic(Request $request, $id)
+    {
+        try {
+
+            $topic = Topic::find($id);
+
+            if (!$topic) {
+                return ResponseHelper::notFound('Topic not found');
+            }
+
+            $topic->update([
+                'is_visible' => false, // Set archived to true
+            ]);
+
+            $topic->save();
+
+            return ResponseHelper::success('Topic archived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Topic not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+    public function unarchiveTopic(Request $request, $id)
+    {
+        try {
+
+            $topic = Topic::find($id);
+
+            if (!$topic) {
+                return ResponseHelper::notFound('Topic not found');
+            }
+
+            $topic->update([
+                'is_visible' => true, // Set archived to true
+            ]);
+
+            $topic->save();
+
+            return ResponseHelper::success('Topic unarchived successfully', null);
+        } catch (QueryException $qe) {
+            return ResponseHelper::serverError($qe->getMessage());
+        } catch (ModelNotFoundException $mnfe) {
+            return ResponseHelper::notFound('Topic not found');
+        } catch (Exception $e) {
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
 
 
 }
