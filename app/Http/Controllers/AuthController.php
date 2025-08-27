@@ -79,7 +79,7 @@ class AuthController extends Controller
         // Create a new user
         try {
             $user = PortalUser::create([
-                'ull_Name' => $full_name,
+                'Full_Name' => $full_name,
                 'Age' => $age,
                 'Email' => $email,
                 'Mobile_No' => $mobile,

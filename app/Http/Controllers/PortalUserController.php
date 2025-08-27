@@ -116,117 +116,163 @@ class PortalUserController extends Controller
         }
     }
 
-    public function update($id, UpdatePortalUserRequest $request)
-    {
-        // Ensure JSON is accepted
-        if (!$request->accepts('application/json')) {
-            return ResponseHelper::invalidMedia();
-        }
-
-        // Only allow PATCH requests
-        if (!$request->isMethod('patch')) {
-            return ResponseHelper::methodInvalid();
-        }
-
-        try {
-            $usersData = $request->json()->all();
-
-            // Check if the request is updating multiple users
-            if (isset($usersData[0]) && is_array($usersData[0])) {
-                // Batch update logic
-                $updatedUsers = [];
-
-                foreach ($usersData as $userData) {
-                    $user = PortalUser::find($userData['id']);
-                    if (!$user) {
-                        continue;
-                    }
-
-                    if (isset($userData['full_name'])) {
-                        $user->full_name = $userData['full_name'];
-                    }
-                    if (isset($userData['age'])) {
-                        $user->age = $userData['age'];
-                    }
-                    if (isset($userData['email'])) {
-                        $user->email = $userData['email'];
-                    }
-                    if (isset($userData['mobile_no'])) {
-                        $user->mobile_no = $userData['mobile_no'];
-                    }
-                    if (isset($userData['address'])) {
-                        $user->address = $userData['address'];
-                    }
-                    if (isset($userData['institution'])) {
-                        $user->institution = $userData['institution'];
-                    }
-                    if (isset($userData['password'])) {
-                        $user->password = bcrypt($userData['password']);
-                    }
-                    if (isset($userData['role'])) {
-                        $user->role = $userData['role'];
-                    }
-                    if (isset($userData['status'])) {
-                        $user->status = $userData['status'];
-                    }
-                    if (isset($userData['course_id'])) {
-                        $user->course_id = $userData['course_id'];
-                    }
-
-                    $user->save();
-                    $updatedUsers[] = $user;
-                }
-
-                return ResponseHelper::success('Users updated successfully', $updatedUsers);
-            }
-
-            // Single user update logic
-            $user = PortalUser::findOrFail($id);
-            if (!$user) {
-                return ResponseHelper::notFound('User not found');
-            }
-
-            if ($request->json('full_name')) {
-                $user->full_name = $request->json('full_name');
-            }
-            if ($request->json('age')) {
-                $user->age = $request->json('age');
-            }
-            if ($request->json('email')) {
-                $user->email = $request->json('email');
-            }
-            if ($request->json('mobile_no')) {
-                $user->mobile_no = $request->json('mobile_no');
-            }
-            if ($request->json('address')) {
-                $user->address = $request->json('address');
-            }
-            if ($request->json('institution')) {
-                $user->institution = $request->json('institution');
-            }
-            if ($request->json('password')) {
-                $user->password = bcrypt($request->json('password'));
-            }
-            if ($request->json('role')) {
-                $user->role = $request->json('role');
-            }
-            if ($request->json('status')) {
-                $user->status = $request->json('status');
-            }
-            if ($request->json('course_id')) {
-                $user->course_id = $request->json('course_id');
-            }
-
-            $user->save();
-
-            return ResponseHelper::success('User updated successfully', $user);
-        } catch (QueryException $qe) {
-            return ResponseHelper::serverError($qe->getMessage());
-        } catch (Exception $e) {
-            return ResponseHelper::serverError($e->getMessage());
-        }
+   public function update($id, UpdatePortalUserRequest $request)
+{
+    // Ensure JSON is accepted
+    if (!$request->accepts('application/json')) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid media type. Only JSON is accepted.',
+        ], 415);
     }
-
+    
+    // Only allow PATCH requests
+    if (!$request->isMethod('patch')) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Method not allowed. Only PATCH is accepted.',
+        ], 405);
+    }
+    
+    try {
+        $usersData = $request->json()->all();
+        
+        // Check if the request is updating multiple users
+        if (isset($usersData[0]) && is_array($usersData[0])) {
+            // Batch update logic
+            $updatedUsers = [];
+            $errors = [];
+            
+            foreach ($usersData as $userData) {
+                $user = PortalUser::find($userData['id']);
+                if (!$user) {
+                    $errors[] = "User with ID {$userData['id']} not found.";
+                    continue;
+                }
+                
+                // Handle profile picture (base64 string)
+                if (isset($userData['profile_picture']) && strpos($userData['profile_picture'], 'data:image') === 0) {
+                    $user->profile_picture = $userData['profile_picture'];
+                }
+                
+                // Update other fields
+                if (isset($userData['full_name'])) {
+                    $user->full_name = $userData['full_name'];
+                }
+                if (isset($userData['age'])) {
+                    $user->age = $userData['age'];
+                }
+                if (isset($userData['email'])) {
+                    $user->email = $userData['email'];
+                }
+                if (isset($userData['mobile_no'])) {
+                    $user->mobile_no = $userData['mobile_no'];
+                }
+                if (isset($userData['address'])) {
+                    $user->address = $userData['address'];
+                }
+                if (isset($userData['institution'])) {
+                    $user->institution = $userData['institution'];
+                }
+                if (isset($userData['password'])) {
+                    $user->password = bcrypt($userData['password']);
+                }
+                if (isset($userData['role'])) {
+                    $user->role = $userData['role'];
+                }
+                if (isset($userData['status'])) {
+                    $user->status = $userData['status'];
+                }
+                if (isset($userData['course_id'])) {
+                    $user->course_id = $userData['course_id'];
+                }
+                
+                $user->save();
+                $updatedUsers[] = $user;
+            }
+            
+            if (!empty($errors)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Some users could not be updated',
+                    'errors' => $errors,
+                    'updated_users' => $updatedUsers
+                ], 207); // 207 Multi-Status
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Users updated successfully',
+                'data' => $updatedUsers
+            ], 200);
+        }
+        
+        // Single user update logic
+        $user = PortalUser::findOrFail($id);
+        
+        // Handle profile picture (base64 string)
+        if ($request->json('profile_picture') && strpos($request->json('profile_picture'), 'data:image') === 0) {
+            $user->profile_picture = $request->json('profile_picture');
+        }
+        
+        // Handle other fields
+        if ($request->json('full_name')) {
+            $user->full_name = $request->json('full_name');
+        }
+        if ($request->json('age')) {
+            $user->age = $request->json('age');
+        }
+        if ($request->json('email')) {
+            $user->email = $request->json('email');
+        }
+        if ($request->json('mobile_no')) {
+            $user->mobile_no = $request->json('mobile_no');
+        }
+        if ($request->json('address')) {
+            $user->address = $request->json('address');
+        }
+        if ($request->json('institution')) {
+            $user->institution = $request->json('institution');
+        }
+        if ($request->json('password')) {
+            $user->password = bcrypt($request->json('password'));
+        }
+        if ($request->json('role')) {
+            $user->role = $request->json('role');
+        }
+        if ($request->json('status')) {
+            $user->status = $request->json('status');
+        }
+        if ($request->json('course_id')) {
+            $user->course_id = $request->json('course_id');
+        }
+        
+        $user->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data' => $user
+        ], 200);
+        
+    } catch (ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (QueryException $qe) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Database error: ' . $qe->getMessage()
+        ], 500);
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Server error: ' . $e->getMessage()
+        ], 500);
+    }
+}
     public function getTeachingModules($userId)
     {
 

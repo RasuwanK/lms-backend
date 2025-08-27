@@ -43,7 +43,7 @@ class ConversationController extends Controller
 
         return response()->json([
             'conversation' => $conversation->load([
-                'participants:id,name,email', // load participants info
+                'participants:id,full_name,email', // load participants info
                 'messages' => fn($q) => $q->latest()->limit(10)->with('sender:id,name,email') // recent messages
             ])
         ]);
