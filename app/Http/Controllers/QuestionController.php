@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\NewQuestion;
 use App\Models\Quiz;
 use App\Models\Question;
 use Illuminate\Http\Request;
@@ -54,7 +55,7 @@ class QuestionController extends Controller
     /**
      * Update the specified question.
      */
-    public function update(Request $request, Quiz $quiz, Question $question)
+    public function update(Request $request, Quiz $quiz, NewQuestion $question)
     {
         if ($question->quiz_id !== $quiz->id) {
             return response()->json(['message' => 'Question not found in this quiz.'], 404);

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
 use App\Models\Answer;
+use App\Models\NewQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,7 +14,7 @@ class AnswerController extends Controller
     /**
      * Display a listing of the answers for a specific question.
      */
-    public function index(Question $question)
+    public function index(NewQuestion $question)
     {
         return response()->json($question->answers);
     }
@@ -21,7 +22,7 @@ class AnswerController extends Controller
     /**
      * Store a newly created answer in storage.
      */
-    public function store(Request $request, Question $question)
+    public function store(Request $request, NewQuestion $question)
     {
         $validator = Validator::make($request->all(), [
             'answer_text' => 'required|string',
@@ -40,7 +41,7 @@ class AnswerController extends Controller
     /**
      * Display the specified answer.
      */
-    public function show(Question $question, Answer $answer)
+    public function show(NewQuestion $question, Answer $answer)
     {
         // Ensure the answer belongs to the question
         if ($answer->question_id !== $question->id) {
@@ -53,7 +54,7 @@ class AnswerController extends Controller
     /**
      * Update the specified answer in storage.
      */
-    public function update(Request $request, Question $question, Answer $answer)
+    public function update(Request $request, NewQuestion $question, Answer $answer)
     {
         // Ensure the answer belongs to the question
         if ($answer->question_id !== $question->id) {
@@ -77,7 +78,7 @@ class AnswerController extends Controller
     /**
      * Remove the specified answer from storage.
      */
-    public function destroy(Question $question, Answer $answer)
+    public function destroy(NewQuestion $question, Answer $answer)
     {
         // Ensure the answer belongs to the question
         if ($answer->question_id !== $question->id) {

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\NewQuiz;
 use App\Models\Quiz;
 use App\Models\Topic;
 use App\Models\QuizSubmission; // ✨ Import the new model
@@ -34,14 +35,14 @@ class QuizController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $quiz = Quiz::create($request->all());
+        $quiz = NewQuiz::create($request->all());
         return response()->json($quiz, 201);
     }
 
     /**
      * Submit a quiz and calculate score.
      */
-    public function submitQuiz(Request $request, Quiz $quiz)
+    public function submitQuiz(Request $request, NewQuiz $quiz)
     {
         // ... (Existing validation)
         $validator = Validator::make($request->all(), [

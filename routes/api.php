@@ -13,9 +13,9 @@ use App\Http\Controllers\TopicController;
 use App\Models\PortalUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Api\QuestionController;
-use App\Http\Controllers\Api\AnswerController;
+use App\Http\Controllers\AnswerController;
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
@@ -88,6 +88,11 @@ Route::prefix('/v1')->group(function () {
         Route::delete('/{id}/questions', [ActivityController::class, 'deleteAllQuestion']);
     });
 
+    Route::prefix('/quizzes')->group(function () {
+    Route::post('/submit', [QuizController::class, 'store']);
+    Route::Get('/index', [AnswerController::class, 'index']);
+    });
+
     Route::prefix('/events')->group(function () {
         // TODO: Need to fix this Route::get('/v1/users/{id}/events', [EventController::class, 'getAllEventsForAUser']);
         Route::get('events/{eventid}', [EventController::class, 'getSpecificEventDetails']);
@@ -156,6 +161,7 @@ Route::prefix('/v1')->group(function () {
         Route::fallback(function () {
             return ResponseHelper::notFound("Invalid user operation");
         });
+
     });
 
     // Course API
@@ -176,6 +182,30 @@ Route::middleware('auth:sanctum')->group(function () {
     // ...
     Route::apiResource('quizzes', QuizController::class);
     Route::apiResource('quizzes.questions', QuestionController::class);
-    // Route::apiResource('questions.answers', AnswerController::class);
+    Route::apiResource('questions.answers', AnswerController::class);
     // ...
 });
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     // Quiz Management (Admin/Teacher)
+//     Route::apiResource('quizzes', QuizController::class);
+
+//     // Question Management (Admin/Teacher)
+//     // The 'update' method is handled separately for FormData compatibility
+//     Route::apiResource('quizzes.questions', QuestionController::class)->except(['update']);
+//     Route::post('quizzes/{quiz}/questions/{question}', [QuestionController::class, 'update']);
+
+//     // Answer Management (Admin/Teacher)
+//     Route::apiResource('questions.answers', AnswerController::class);
+
+//     // Student Quiz Interaction
+//     Route::get('topics/{topic}/quizzes', [QuizController::class, 'getQuizzesByTopic']);
+//     Route::get('quizzes/{quiz}/take', [QuizController::class, 'takeQuiz']);
+//     Route::post('quizzes/{quiz}/submit', [QuizController::class, 'submitQuiz']);
+// });
+
+
+
+
+
+ 
