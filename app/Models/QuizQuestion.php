@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NewQuestion extends Model
+class QuizQuestion extends Model
 {
     use HasFactory;
 
@@ -16,6 +16,9 @@ class NewQuestion extends Model
         'image_url', // ✨ Add new field
         'points',
     ];
+
+        // ✨ Ensure this line correctly specifies the 'questions' table
+    protected $table = 'quizquestions'; 
 
     public function quiz()
     {

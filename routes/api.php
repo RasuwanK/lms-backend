@@ -89,7 +89,7 @@ Route::prefix('/v1')->group(function () {
     });
 
     Route::prefix('/quizzes')->group(function () {
-    Route::post('/submit', [QuizController::class, 'store']);
+    Route::post('/question/store', [QuizController::class, 'store']);
     Route::Get('/index', [AnswerController::class, 'index']);
     });
 

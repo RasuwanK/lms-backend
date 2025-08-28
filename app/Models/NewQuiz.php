@@ -13,11 +13,15 @@ class NewQuiz extends Model
         'topic_id',
         'title',
         'description',
+        'type',
         'deadline', // ✨ Add new field
         'duration_minutes',
         'pass_percentage',
         'is_published',
     ];
+
+        // ✨ Ensure this line correctly specifies the 'quizzes' table
+    protected $table = 'quizzes'; 
 
     protected $casts = [
         'deadline' => 'datetime', // ✨ Cast deadline to a Carbon instance
