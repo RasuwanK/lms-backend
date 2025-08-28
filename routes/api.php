@@ -178,13 +178,13 @@ Route::fallback(function () {
 });
 
 
-Route::middleware('auth:sanctum')->group(function () {
-    // ...
-    Route::apiResource('quizzes', QuizController::class);
-    Route::apiResource('quizzes.questions', QuestionController::class);
-    Route::apiResource('questions.answers', AnswerController::class);
-    // ...
-});
+// Route::middleware('auth:sanctum')->group(function () {
+//     // ...
+//     Route::apiResource('quizzes', QuizController::class);
+//     Route::apiResource('quizzes.questions', QuestionController::class);
+//     Route::apiResource('questions.answers', AnswerController::class);
+//     // ...
+// });
 
 // Route::middleware('auth:sanctum')->group(function () {
 //     // Quiz Management (Admin/Teacher)
