@@ -13,6 +13,9 @@ use App\Http\Controllers\TopicController;
 use App\Models\PortalUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\AnswerController;
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
@@ -166,4 +169,13 @@ Route::prefix('/v1')->group(function () {
 // Route does not available in the entire api /api/
 Route::fallback(function () {
     return ResponseHelper::notFound("Invalid api version");
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    // ...
+    Route::apiResource('quizzes', QuizController::class);
+    Route::apiResource('quizzes.questions', QuestionController::class);
+    // Route::apiResource('questions.answers', AnswerController::class);
+    // ...
 });
