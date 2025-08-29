@@ -50,10 +50,13 @@ Route::prefix('/v1')->group(function () {
         Route::get('/{moduleid}/topics', [ModuleController::class, 'getTopics']);
         Route::patch('/{moduleid}/topic/{topicid}', [ModuleController::class, 'updateTopic']);
         Route::delete('/{moduleid}/topic/{topicid}', [ModuleController::class, 'deleteTopic']);
+        Route::patch('/{id}/archive', [ModuleController::class, 'archiveModule']);
+        Route::patch('/{id}/unarchive', [ModuleController::class, 'unarchiveModule']);
     });
 
     // Announcements related
     Route::prefix('/announcements')->group(function () {
+        Route::post('/{announcementid}', [ModuleController::class, 'createAnnouncement']);
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
         Route::delete('/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
         //Route::post(uri: '/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
@@ -71,12 +74,15 @@ Route::prefix('/v1')->group(function () {
 
     // Topics related
     Route::prefix('/topics')->group(function () {
-        Route::post('/{topicid}/materials', [ModuleController::class, 'addLectureMaterial']);
+        Route::post('/{topicid}/materials', [TopicController::class, 'addLectureMaterial']);
         Route::get('/{topicid}/materials', [ModuleController::class, 'getLectureMaterials']);
         Route::patch('/{topicid}/materials/{materialsid}', [TopicController::class, 'updateMaterials']);
         Route::delete('/{topicid}/materials/{materialsid}', [TopicController::class, 'deleteMaterials']);
         Route::patch('/{topicid}/toggle-visibility', [TopicController::class, 'toggleVisibility']);
         Route::patch('/{topicid}/mark-complete', [TopicController::class, 'markAsComplete']);
+        Route::patch('/{topicid}/archive', [TopicController::class, 'archiveTopic']);
+        Route::patch('/{topicid}/unarchive', [TopicController::class, 'unarchiveTopic']);
+        Route::post('/{topicid}/materials/upload', [TopicController::class, 'uploadLectureMaterial']);
     });
 
     Route::prefix('/quiz')->group(function () {
@@ -123,25 +129,26 @@ Route::prefix('/v1')->group(function () {
         Route::get('/test', function () {
             return ResponseHelper::success("Testing user API");
         });
-        Route::get('/', [PortalUserController::class, 'all']);
-        Route::get('/{id}/enrolled/modules', [PortalUserController::class, 'getEnrolledModules']);
-        Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
-        
-        Route::get('/students', [PortalUserController::class, 'students']);
-        Route::get('/lecturers', [PortalUserController::class, 'lecturers']);
-        Route::post('/', [PortalUserController::class, 'create']);
-        Route::patch('/{id}/', [PortalUserController::class, 'update']);
-        Route::delete('/{id}/', [PortalUserController::class, 'delete']);
-        Route::get('/{id}', [PortalUserController::class, 'read']);
-        Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
-        Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
-        Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
-
         Route::prefix('/auth')->group(function () {
             Route::post('/signin', [AuthController::class, 'signin']);
             Route::post('/signout', [AuthController::class, 'signout'])->middleware('auth:sanctum');
             Route::post('/signup', [AuthController::class, 'signup']);
         });
+        Route::get('/', [PortalUserController::class, 'all']);
+        Route::get('/{id}/enrolled/modules', action: [PortalUserController::class, 'getEnrolledModules']);
+        Route::get('/{id}/enrolled/courses', [PortalUserController::class, 'getEnrolledCourses']);
+
+        Route::get('/students', [PortalUserController::class, 'students']);
+        Route::get('/lecturers', [PortalUserController::class, 'lecturers']);
+        Route::post('/', [PortalUserController::class, 'create']);
+        Route::patch('/{id}/', [PortalUserController::class, 'update']);
+        Route::delete('/{id}/', [PortalUserController::class, 'delete']);
+
+        Route::get('/{id}', [PortalUserController::class, 'read'])->middleware('auth:sanctum');
+
+        Route::get('/{id}/events', [EventController::class, 'getAllEventsForAUser']);   // new event routes
+        Route::get('/{id}/events/{eventid}', [EventController::class, 'getSpecificEventForAUser']);   // new event routes
+        Route::get('/{id}/teaching/modules', [PortalUserController::class, 'getTeachingModules']);
     });
 
     //    Route::get('/v1/modules',[ModuleController::class,'showAllModules']);
@@ -158,7 +165,7 @@ Route::prefix('/v1')->group(function () {
         });
 
         // Event Routes
-        Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
+        Route::get('/{id}/courses', action: [PortalUserController::class, 'getUserCourses']);
         Route::get('/{id}/{field}', [PortalUserController::class, 'getFilteredInfo']);
         Route::get('/{id}/courses', [PortalUserController::class, 'getUserCourses']);
 
@@ -169,7 +176,7 @@ Route::prefix('/v1')->group(function () {
     });
 
     // Course API
-    Route::prefix('courses')->group(function () {});
+    Route::prefix('courses')->group(function () { });
 
     Route::fallback(function () {
         return ResponseHelper::notFound("Invalid api operation");

@@ -13,37 +13,46 @@ use Illuminate\Validation\ValidationException;
 class ParticipateController extends Controller
 {
     public function submitActivity(Request $request, $activityId)
-    {
-        try {
-            $activity = Activity::with('participants')->findOrFail($activityId);
+{
+    try {
+        $activity = Activity::with('participants')->findOrFail($activityId);
 
-            $request->validate([
-                'user_id' => 'required|exists:portal_users,id', // Ensure the user exists
-                'submission' => 'required|string', // Submission content
-            ]);
+        $request->validate([
+            'user_id' => 'required|exists:portal_users,id',
+            'submission' => 'nullable|string',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240', // 10MB max
+        ]);
 
-            // Use the pivot table directly if relationship issues persist
-            $activity->participants()->syncWithoutDetaching([
-                $request->user_id => [
-                    'submission' => $request->submission,
-                    'is_done' => true,
-                    'updated_at' => now(),
-                ]
-            ]);
+        $filePath = null;
 
-            return ResponseHelper::success('Submission recorded successfully.', [
-                'activity' => $activity->activity_name,
-                'module' => $activity->module->module_name,
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return ResponseHelper::error('Activity not found.', 404);
-        } catch (ValidationException $e) {
-            return ResponseHelper::validationError('Validation failed.', $e->errors());
-        } catch (Exception $e) {
-            return ResponseHelper::error('An error occurred while submitting the activity.', 500, $e->getMessage());
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('submissions', 'public');
         }
+
+        $activity->participants()->syncWithoutDetaching([
+            $request->user_id => [
+                'submission' => $request->submission,
+                'file_path' => $filePath,   // Add column in pivot table
+                'is_done' => true,
+                'updated_at' => now(),
+            ]
+        ]);
+
+        return ResponseHelper::success('Submission recorded successfully.', [
+            'activity' => $activity->activity_name,
+            'module' => $activity->module->module_name,
+            'file' => $filePath,
+        ], 200);
+
+    } catch (ModelNotFoundException $e) {
+        return ResponseHelper::error('Activity not found.', 404);
+    } catch (ValidationException $e) {
+        return ResponseHelper::invalid('Validation failed.', $e->errors());
+    } catch (Exception $e) {
+        return ResponseHelper::error('An error occurred while submitting the activity.', 500, $e->getMessage());
     }
+}
+
 
 
     public function fetchSubmissions($activityId)
