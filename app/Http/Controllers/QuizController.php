@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\NewQuiz;
-use App\Models\Quiz;
+use App\Models\QuizQuestion;
 use App\Models\Topic;
 use App\Models\QuizSubmission; // ✨ Import the new model
 use Illuminate\Http\Request;
@@ -19,6 +19,21 @@ class QuizController extends Controller
     /**
      * Store a newly created quiz in storage.
      */
+
+    public function index()
+    {
+        $quizzes = QuizQuestion::all();
+        return response()->json($quizzes);
+    }
+
+    public function showQuizzes()
+    {
+        $quizzes = NewQuiz::all();
+        return response()->json($quizzes);
+    }
+
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

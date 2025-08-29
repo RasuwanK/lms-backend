@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\NewQuestion;
+use App\Models\NewQuiz;
+use App\Models\QuizQuestion;
 use App\Models\Quiz;
 use App\Models\Question;
 use Illuminate\Http\Request;
@@ -15,6 +16,14 @@ class QuestionController extends Controller
     /**
      * Store a newly created question for a specific quiz.
      */
+    public function index()
+    {
+        $Newquizzes = NewQuiz::all();
+        return response()->json($Newquizzes);
+    }
+
+
+
     public function store(Request $request, Quiz $quiz)
     {
         $validator = Validator::make($request->all(), [
@@ -55,7 +64,7 @@ class QuestionController extends Controller
     /**
      * Update the specified question.
      */
-    public function update(Request $request, Quiz $quiz, NewQuestion $question)
+    public function update(Request $request, Quiz $quiz, QuizQuestion $question)
     {
         if ($question->quiz_id !== $quiz->id) {
             return response()->json(['message' => 'Question not found in this quiz.'], 404);

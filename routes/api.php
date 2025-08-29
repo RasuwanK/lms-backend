@@ -90,7 +90,11 @@ Route::prefix('/v1')->group(function () {
 
     Route::prefix('/quizzes')->group(function () {
     Route::post('/question/store', [QuizController::class, 'store']);
-    Route::Get('/index', [AnswerController::class, 'index']);
+    Route::Get('/quizAnswerList', [AnswerController::class, 'index']);
+
+    Route::Get('/quizList', [QuizController::class, 'index']);
+
+    Route::get('/quizzes', [QuizController::class, 'showQuizzes']);
     });
 
     Route::prefix('/events')->group(function () {

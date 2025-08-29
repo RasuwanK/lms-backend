@@ -15,7 +15,9 @@ class AnswerController extends Controller
      */
     public function index(QuizQuestion $question)
     {
-        return response()->json($question->answers);
+
+    $questions = QuizAnswer::all();
+    return response()->json($questions);
     }
 
     /**

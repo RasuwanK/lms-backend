@@ -34,7 +34,7 @@ class NewQuiz extends Model
 
     public function questions()
     {
-        return $this->hasMany(NewQuestion::class);
+        return $this->hasMany(QuizQuestion::class);
     }
 
     public function submissions()
