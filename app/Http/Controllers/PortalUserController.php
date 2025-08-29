@@ -27,6 +27,24 @@ class PortalUserController extends Controller
         }
     }
 
+    public function getTeachingModules(Request $request, $id)
+    {
+        try {
+            $user = PortalUser::find($id);
+
+            if(!$user) return ResponseHelper::notFound('User not found');
+
+            $modules = $user->teaches->makeHidden('pivot');
+
+            // Use the ResponseHelper to return a success response
+            return ResponseHelper::success('Modules retrieved successfully', $modules);
+        } catch (Exception $e) {
+            // Catch any general exceptions and use ResponseHelper for error response
+            return ResponseHelper::serverError($e->getMessage());
+        }
+    }
+
+
     public function students(Request $request)
     {
         try {
@@ -243,19 +261,6 @@ class PortalUserController extends Controller
         } catch (Exception $e) {
             return ResponseHelper::serverError('Server error: ' . $e->getMessage());
         }
-    }
-
-    public function getTeachingModules($userId)
-    {
-
-        $user = PortalUser::find($userId);
-
-        if (!$user) {
-            return ResponseHelper::notFound('User not found');
-        }
-
-        $modules = $user->teaches()->with('courses')->get();
-        return ResponseHelper::success('User course fetched successfully', $modules);
     }
 
     public function read($id)

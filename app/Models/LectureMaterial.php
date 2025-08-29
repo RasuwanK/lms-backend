@@ -13,12 +13,17 @@ class LectureMaterial extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'material_type',
-        'material_title',
-        'material_url'
+        'topic_id',
+        'material_type',   // e.g. pdf, docx, ppt, link
+        'material_title',  // display title
+        'material_url',    // if it's an external link
+        'file_path',       // if it's a stored file in Laravel storage
+        'file_size',       // file size in bytes
+        'mime_type',       // MIME type of uploaded file
     ];
 
-    public function topic(){
-        $this->belongsTo(Topic::class);
+    public function topic()
+    {
+        return $this->belongsTo(Topic::class);
     }
 }

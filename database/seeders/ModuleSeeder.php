@@ -27,6 +27,7 @@ class ModuleSeeder extends Seeder
 
             $module = Module::create([
                 'module_name' => 'Module ' . $i,
+                'description' => 'This is the description for Module ' . $i,
                 'credit_value' => rand(2, 5),
                 'practical_exam_count' => rand(0, 2),
                 'writing_exam_count' => rand(0, 2),

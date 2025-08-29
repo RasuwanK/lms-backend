@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('answers', function (Blueprint $table) {
+        Schema::create('quizanswers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('question_id')->constrained()->onDelete('cascade'); // ✨ This line is crucial
+            // This line defines the 'quizquestion_id' column and sets up the foreign key
+            // It automatically constrains to the 'id' column of the 'quizquestions' table.
+            $table->foreignId('quizquestion_id')->constrained('quizquestions')->onDelete('cascade');
             $table->text('answer_text');
             $table->boolean('is_correct')->default(false);
             $table->timestamps();
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('answers');
+        Schema::dropIfExists('quizanswers');
     }
 };

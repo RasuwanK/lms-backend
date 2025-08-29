@@ -11,39 +11,71 @@ use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
-    public function addQuestion(Request $request, $quizId)
-    {
-        try {
-            $quiz = Activity::where('id', $quizId)->where('type', 'quiz')->firstOrFail();
+    // public function addQuestion(Request $request, $quizId)
+    // {
+    //     try {
+    //         $quiz = Activity::where('id', $quizId)->where('type', 'quiz')->firstOrFail();
 
-            $request->validate([
-                'questions' => 'required|array',
-                'questions.*.question_number' => 'required|integer',
-                'questions.*.question' => 'required|string',
-                'questions.*.question_type' => 'required|in:single_answer,multiple_choice',
-                'questions.*.answer' => 'required|string',
-                'questions.*.options' => 'nullable|array',
-            ]);
+    //         $request->validate([
+    //             'questions' => 'required|array',
+    //             'questions.*.question_number' => 'required|integer',
+    //             'questions.*.question' => 'required|string',
+    //             'questions.*.question_type' => 'required|in:single_answer,multiple_choice',
+    //             'questions.*.answer' => 'required|string',
+    //             'questions.*.options' => 'nullable|array',
+    //         ]);
 
-            $currentQuestionCount = $quiz->questions()->count();
-            $newQuestionCount = count($request->questions);
-            $maxQuestions = $quiz->question_count;
+    //         $currentQuestionCount = $quiz->questions()->count();
+    //         $newQuestionCount = count($request->questions);
+    //         $maxQuestions = $quiz->question_count;
 
-            if (($currentQuestionCount + $newQuestionCount) > $maxQuestions) {
-                return ResponseHelper::validationError('Cannot add more questions. Maximum question count exceeded.');
-            }
+    //         if (($currentQuestionCount + $newQuestionCount) > $maxQuestions) {
+    //             return ResponseHelper::validationError('Cannot add more questions. Maximum question count exceeded.');
+    //         }
 
-            foreach ($request->questions as $questionData) {
-                $quiz->questions()->create($questionData);
-            }
+    //         foreach ($request->questions as $questionData) {
+    //             $quiz->questions()->create($questionData);
+    //         }
 
-            return ResponseHelper::success('Questions added successfully.');
-        } catch (ModelNotFoundException $e) {
-            return ResponseHelper::notFound('Quiz not found.');
-        } catch (Exception $e) {
-            return ResponseHelper::serverError('An error occurred while adding questions.', $e->getMessage());
-        }
+    //         return ResponseHelper::success('Questions added successfully.');
+    //     } catch (ModelNotFoundException $e) {
+    //         return ResponseHelper::notFound('Quiz not found.');
+    //     } catch (Exception $e) {
+    //         return ResponseHelper::serverError('An error occurred while adding questions.', $e->getMessage());
+    //     }
+    // }
+
+    // ========================================start testing code============================================
+// ===============================================heshan===============================================
+public function addQuestion(Request $request, $quizId)
+{
+    // Check if request payload is coming
+    // return response()->json($request->all()); // Uncomment to debug
+
+    $quiz = Activity::where('id', $quizId)
+        ->where('type', 'quiz')
+        ->first();
+
+    if (!$quiz) {
+        return response()->json(['message' => 'Quiz not found.'], 404);
     }
+
+    $questions = $request->input('questions', []);
+
+    if (empty($questions)) {
+        return response()->json(['message' => 'No questions received.'], 400);
+    }
+
+    foreach ((array)$questions as $questionData) {
+        $quiz->questions()->create($questionData);
+    }
+
+    return response()->json(['message' => 'Questions added successfully.']);
+}
+
+
+// ===========================================================================================================
+//========================================end=================================================================
 
     public function getQuestions($quizId)
     {

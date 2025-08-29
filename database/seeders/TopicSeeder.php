@@ -50,7 +50,7 @@ class TopicSeeder extends Seeder
         $topicCount = min(rand(20, 40), count($sampleTitles));
 
 
-        for ($i = 1; $i <= $topicCount; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             Topic::create([
                 'title' => fake()->unique()->randomElement($sampleTitles),
                 'description' => fake()->sentence(8),

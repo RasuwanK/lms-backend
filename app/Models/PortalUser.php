@@ -16,6 +16,7 @@ class PortalUser extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'Id',
         'Full_Name',
         'Age',
         'Email',

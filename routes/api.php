@@ -16,8 +16,14 @@ use App\Models\PortalUser;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+<<<<<<< HEAD
 use App\Http\Controllers\ResultController;
 
+=======
+use App\Http\Controllers\QuizController;
+use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\AnswerController;
+>>>>>>> 5f162254946714b43849fe7c8811c37245ef22b1
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
@@ -67,6 +73,7 @@ Route::prefix('/v1')->group(function () {
     });
     // Announcements related
     Route::prefix('/announcements')->group(function () {
+        Route::post('/{announcementid}', [ModuleController::class, 'createAnnouncement']);
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
         Route::delete('/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
         Route::post('/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
@@ -92,15 +99,25 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{topicid}/mark-complete', [TopicController::class, 'markAsComplete']);
         Route::patch('/{topicid}/archive', [TopicController::class, 'archiveTopic']);
         Route::patch('/{topicid}/unarchive', [TopicController::class, 'unarchiveTopic']);
-
+        Route::post('/{topicid}/materials/upload', [TopicController::class, 'uploadLectureMaterial']);
     });
 
     Route::prefix('/quiz')->group(function () {
+        // Route::get('/', [ActivityController::class, 'addQuestion']);
         Route::post('/{id}/questions', [ActivityController::class, 'addQuestion']);
         Route::get('/{id}/questions', [ActivityController::class, 'getQuestions']);
         Route::patch('/{id}/questions/{queid}', [ActivityController::class, 'updateQuestion']);
         Route::delete('/{id}/questions/{queid}', [ActivityController::class, 'deleteSpecificQuestion']);
         Route::delete('/{id}/questions', [ActivityController::class, 'deleteAllQuestion']);
+    });
+
+    Route::prefix('/quizzes')->group(function () {
+    Route::post('/question/store', [QuizController::class, 'store']);
+    Route::Get('/quizAnswerList', [AnswerController::class, 'index']);
+
+    Route::Get('/quizList', [QuizController::class, 'index']);
+
+    Route::get('/quizzes', [QuizController::class, 'showQuizzes']);
     });
 
     Route::prefix('/events')->group(function () {
@@ -172,10 +189,11 @@ Route::prefix('/v1')->group(function () {
         Route::fallback(function () {
             return ResponseHelper::notFound("Invalid user operation");
         });
+
     });
 
     // Course API
-    Route::prefix('courses')->group(function () {});
+    Route::prefix('courses')->group(function () { });
 
     Route::fallback(function () {
         return ResponseHelper::notFound("Invalid api operation");
@@ -186,3 +204,36 @@ Route::prefix('/v1')->group(function () {
 Route::fallback(function () {
     return ResponseHelper::notFound("Invalid api version");
 });
+
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     // ...
+//     Route::apiResource('quizzes', QuizController::class);
+//     Route::apiResource('quizzes.questions', QuestionController::class);
+//     Route::apiResource('questions.answers', AnswerController::class);
+//     // ...
+// });
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     // Quiz Management (Admin/Teacher)
+//     Route::apiResource('quizzes', QuizController::class);
+
+//     // Question Management (Admin/Teacher)
+//     // The 'update' method is handled separately for FormData compatibility
+//     Route::apiResource('quizzes.questions', QuestionController::class)->except(['update']);
+//     Route::post('quizzes/{quiz}/questions/{question}', [QuestionController::class, 'update']);
+
+//     // Answer Management (Admin/Teacher)
+//     Route::apiResource('questions.answers', AnswerController::class);
+
+//     // Student Quiz Interaction
+//     Route::get('topics/{topic}/quizzes', [QuizController::class, 'getQuizzesByTopic']);
+//     Route::get('quizzes/{quiz}/take', [QuizController::class, 'takeQuiz']);
+//     Route::post('quizzes/{quiz}/submit', [QuizController::class, 'submitQuiz']);
+// });
+
+
+
+
+
+ 
