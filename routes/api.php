@@ -66,7 +66,7 @@ Route::prefix('/v1')->group(function () {
     Route::prefix('/announcements')->group(function () {
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
         Route::delete('/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
-        //Route::post(uri: '/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
+        Route::post('/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
         Route::get('/{announcementid}/answers', [AnnouncementController::class, 'getAnswers']);
         Route::patch('/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'updateAnswer'])->middleware('auth:sanctum');
         Route::delete('/{announcementid}/answers/{answerid}', [AnnouncementController::class, 'deleteAnswer'])->middleware('auth:sanctum');
