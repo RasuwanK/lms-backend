@@ -53,6 +53,7 @@ Route::prefix('/v1')->group(function () {
 
     // Announcements related
     Route::prefix('/announcements')->group(function () {
+        Route::post('/{announcementid}', [ModuleController::class, 'createAnnouncement']);
         Route::patch('/{announcementid}', [ModuleController::class, 'updateAnnouncement']);
         Route::delete('/{announcementid}', [ModuleController::class, 'deleteAnnouncement']);
         //Route::post(uri: '/{announcementid}/answers', [AnnouncementController::class, 'addAnswer']);
@@ -78,7 +79,7 @@ Route::prefix('/v1')->group(function () {
         Route::patch('/{topicid}/mark-complete', [TopicController::class, 'markAsComplete']);
         Route::patch('/{topicid}/archive', [TopicController::class, 'archiveTopic']);
         Route::patch('/{topicid}/unarchive', [TopicController::class, 'unarchiveTopic']);
-
+        Route::post('/{topicid}/materials/upload', [TopicController::class, 'uploadLectureMaterial']);
     });
 
     Route::prefix('/quiz')->group(function () {
@@ -161,7 +162,7 @@ Route::prefix('/v1')->group(function () {
     });
 
     // Course API
-    Route::prefix('courses')->group(function () {});
+    Route::prefix('courses')->group(function () { });
 
     Route::fallback(function () {
         return ResponseHelper::notFound("Invalid api operation");

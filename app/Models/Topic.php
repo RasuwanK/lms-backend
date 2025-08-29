@@ -8,27 +8,30 @@ use Illuminate\Database\Eloquent\Model;
 class Topic extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'title',
         'description',
         'type',
         'is_visible',
-        'is_complete'
+        'is_complete',
     ];
 
     protected $table = 'topics';
+
     public function course()
     {
-        $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class);
     }
 
     public function module()
     {
-        $this->belongsTo(Module::class);
+        return $this->belongsTo(Module::class);
     }
 
-    public function lectureMaterials(){
+    // ✅ Replace lectureMaterials with resources
+    public function lectureMaterials()
+    {
         return $this->hasMany(LectureMaterial::class);
     }
-
 }

@@ -12,6 +12,28 @@ use Illuminate\Http\Request;
 
 class TopicController extends Controller
 {
+    public function uploadLectureMaterial(Request $request, $topicId)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240',
+            'material_title' => 'required|string|max:255',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store("materials/{$topicId}", 'public');
+
+        $material = LectureMaterial::create([
+            'topic_id' => $topicId,
+            'material_type' => 'file',
+            'material_title' => $request->material_title,
+            'file_path' => $path,
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getClientMimeType(),
+        ]);
+
+        return response()->json(['success' => true, 'data' => $material]);
+    }
+
     public function toggleVisibility($topic_id)
     {
         try {
