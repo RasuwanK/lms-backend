@@ -16,14 +16,13 @@ use App\Models\PortalUser;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
+
 use App\Http\Controllers\ResultController;
 
-=======
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\AnswerController;
->>>>>>> 5f162254946714b43849fe7c8811c37245ef22b1
+
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
