@@ -57,4 +57,10 @@ class Module extends Model
         return $this->belongsToMany(PortalUser::class, 'teaches', 'module_id', 'user_id')
             ->withTimestamps();
     }
+
+    public function results()
+    {
+        return $this->hasMany(Result::class, 'module_id');  // A module has many results
+    }
+
 }

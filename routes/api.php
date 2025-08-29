@@ -16,6 +16,8 @@ use App\Models\PortalUser;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ResultController;
+
 
 Route::post('/generate-token/{id}', function (Request $request, $id) {
     $user = PortalUser::findOrFail($id);
@@ -28,7 +30,8 @@ Route::post('/generate-token/{id}', function (Request $request, $id) {
 
 // Related to version 1.0
 Route::prefix('/v1')->group(function () {
-
+    Route::post('/add-results', [ResultController::class, 'addResults']);  // Route to quickly add hardcoded results
+    Route::get('/results/{userId}', [ResultController::class, 'getUserResults']); // Route to get results for a specific user
     // Modules related
     Route::prefix('/modules')->group(function () {
         Route::get('/', [ModuleController::class, 'showAllModules']);

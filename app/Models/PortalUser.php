@@ -67,4 +67,10 @@ class PortalUser extends Authenticatable
     {
         return $this->course ? $this->course->modules : collect(); // Safe fallback
     }
+
+    public function results()
+    {
+        return $this->hasMany(Result::class, 'user_id');  // A user has many results
+    }
+
 }
